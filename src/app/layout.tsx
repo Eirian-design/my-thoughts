@@ -21,6 +21,7 @@ export default function RootLayout({
             </a>
             <nav className="flex gap-6 text-sm text-stone-500">
               <a href="/" className="hover:text-stone-800 transition-colors">首页</a>
+              <a href="/admin" className="hover:text-stone-800 transition-colors">写文章</a>
               <a href="https://github.com/Eirian-design" target="_blank" rel="noopener noreferrer" className="hover:text-stone-800 transition-colors">GitHub</a>
             </nav>
           </header>
