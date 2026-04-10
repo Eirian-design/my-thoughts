@@ -1,36 +1,24 @@
 "use client";
 
 import { useEffect, useState } from "react";
-
-// 文章数据（后续可改为动态获取）
-const postsData: Record<string, { title: string; content: string; date: string }> = {
-  "hello-world": {
-    title: "你好，世界",
-    content: `这是我的第一个想法站点。
-
-很高兴在这里与你相遇。
-
-我在这里记录一些日常的思考、学习心得，以及偶尔的灵感闪现。
-
-如果你有什么想法，欢迎在下方评论告诉我！`,
-    date: "2026-04-10",
-  },
-};
+import Link from "next/link";
+import { posts } from "../../../data/posts";
 
 export default function PostPage({ params }: { params: Promise<{ id: string }> }) {
-  const [post, setPost] = useState<{ title: string; content: string; date: string } | null>(null);
+  const [post, setPost] = useState<(typeof posts)[0] | null>(null);
   const [id, setId] = useState<string>("");
 
   useEffect(() => {
     params.then((p) => {
       setId(p.id);
-      setPost(postsData[p.id] || null);
+      const found = posts.find((post) => post.id === p.id);
+      setPost(found || null);
     });
   }, [params]);
 
   useEffect(() => {
     if (id) {
-      // 动态加载 Waline
+      // 动态加载 Waline 评论
       const script = document.createElement("script");
       script.src = "https://cdn.jsdelivr.net/npm/@waline/client/dist/waline.js";
       script.onload = () => {
@@ -43,7 +31,6 @@ export default function PostPage({ params }: { params: Promise<{ id: string }> }
       };
       document.head.appendChild(script);
 
-      // 加载样式
       const link = document.createElement("link");
       link.rel = "stylesheet";
       link.href = "https://cdn.jsdelivr.net/npm/@waline/client/dist/waline.css";
@@ -53,20 +40,44 @@ export default function PostPage({ params }: { params: Promise<{ id: string }> }
 
   if (!post) {
     return (
-      <div className="text-center py-20 text-stone-400">
-        文章不存在
+      <div className="text-center py-20">
+        <p className="text-stone-400 mb-4">文章不存在</p>
+        <Link href="/" className="text-amber-600 hover:underline">
+          返回首页
+        </Link>
       </div>
     );
   }
 
   return (
     <article className="space-y-8">
-      <header className="space-y-2">
-        <h1 className="text-3xl font-normal text-stone-800">{post.title}</h1>
-        <time className="text-sm text-stone-400">{post.date}</time>
+      <header className="space-y-4">
+        <Link
+          href="/"
+          className="inline-flex items-center text-sm text-stone-400 hover:text-stone-600 transition-colors"
+        >
+          <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+          </svg>
+          返回首页
+        </Link>
+        <div className="flex items-center gap-3">
+          <time className="text-sm text-stone-400">{post.date}</time>
+          <div className="flex gap-2">
+            {post.tags.map((tag) => (
+              <span
+                key={tag}
+                className="text-xs px-2 py-1 rounded-full bg-stone-100 text-stone-500"
+              >
+                {tag}
+              </span>
+            ))}
+          </div>
+        </div>
+        <h1 className="text-4xl font-light text-stone-800">{post.title}</h1>
       </header>
 
-      <div className="prose prose-stone prose-lg max-w-none">
+      <div className="prose prose-stone prose-lg max-w-none py-8 border-t border-b border-stone-100">
         {post.content.split("\n\n").map((paragraph, i) => (
           <p key={i} className="text-stone-600 leading-relaxed whitespace-pre-line">
             {paragraph}

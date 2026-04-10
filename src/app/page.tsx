@@ -1,22 +1,12 @@
-// 示例文章数据
-const posts = [
-  {
-    id: "hello-world",
-    title: "你好，世界",
-    excerpt: "这是我的第一个想法站点。很高兴在这里与你相遇。",
-    date: "2026-04-10",
-    tags: ["随笔"],
-  },
-  {
-    id: "second-post",
-    title: "关于写作的一些思考",
-    excerpt: "写作是一种自我对话的方式，也是与世界建立连接的桥梁。",
-    date: "2026-04-11",
-    tags: ["思考", "写作"],
-  },
-];
+import Link from "next/link";
+import { posts } from "../data/posts";
 
 export default function Home() {
+  // 按日期排序，最新的在前面
+  const sortedPosts = [...posts].sort((a, b) => 
+    new Date(b.date).getTime() - new Date(a.date).getTime()
+  );
+
   return (
     <div className="space-y-20">
       {/* Hero 部分 */}
@@ -50,12 +40,12 @@ export default function Home() {
           最近的文章
         </h2>
         <div className="grid gap-8">
-          {posts.map((post) => (
+          {sortedPosts.map((post) => (
             <article
               key={post.id}
               className="group relative bg-white rounded-2xl p-8 shadow-sm hover:shadow-md transition-all duration-300 border border-stone-100"
             >
-              <a href={`/post/${post.id}`} className="block">
+              <Link href={`/post/${post.id}`} className="block">
                 <div className="flex items-center gap-3 mb-4">
                   <time className="text-sm text-stone-400">{post.date}</time>
                   <div className="flex gap-2">
@@ -81,7 +71,7 @@ export default function Home() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                   </svg>
                 </span>
-              </a>
+              </Link>
             </article>
           ))}
         </div>
