@@ -318,7 +318,7 @@ export default function AdminPage() {
       <div className="min-h-screen flex items-center justify-center px-4" style={{ background: 'var(--bg)' }}>
         <form
           onSubmit={handleLogin}
-          className="gothic-card p-8 rounded-xl w-full max-w-md"
+          className="card p-8 rounded-xl w-full max-w-md"
         >
           <h1 className="text-2xl font-serif text-center mb-6" style={{ color: 'var(--text)' }}>
             管理后台
@@ -357,7 +357,7 @@ export default function AdminPage() {
       </div>
 
       {/* GitHub Token 设置 */}
-      <div className="gothic-card rounded-lg p-4 mb-6" style={{ borderLeft: '3px solid var(--accent)' }}>
+      <div className="card rounded-lg p-4 mb-6" style={{ borderLeft: '3px solid var(--accent)' }}>
         <label className="block text-sm mb-2" style={{ color: 'var(--text)' }}>🔑 GitHub Token（自动发布用）</label>
         <div className="flex gap-2">
           <input
@@ -431,7 +431,7 @@ export default function AdminPage() {
         </div>
 
         {/* 富文本工具栏 */}
-        <div className="gothic-card rounded-lg p-3 flex flex-wrap gap-2" style={{ background: 'var(--bg-card)' }}>
+        <div className="card rounded-lg p-3 flex flex-wrap gap-2" style={{ background: 'var(--bg-card)' }}>
           <span className="text-xs mr-2" style={{ color: 'var(--text-light)' }}>插入:</span>
           <button
             type="button"
@@ -504,7 +504,7 @@ export default function AdminPage() {
           {blocks.map((block, index) => (
             <div 
               key={index} 
-              className="gothic-card rounded-lg p-4 relative group"
+              className="card rounded-lg p-4 relative group"
               style={{ 
                 borderLeft: activeBlock === index ? '3px solid var(--accent)' : '3px solid transparent' 
               }}

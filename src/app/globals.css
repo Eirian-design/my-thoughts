@@ -1,28 +1,28 @@
 @import "tailwindcss";
 
 :root {
-  --bg: #faf9f7;
+  --bg: #0a0a0a;
   --bg-card: #ffffff;
   --text: #1a1a1a;
-  --text-light: #5a5a5a;
-  --accent: #1a1a1a;
-  --border: #d4d4d4;
+  --text-light: #666666;
+  --accent: #8b7355;
+  --border: #333333;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --bg: #111111;
-    --bg-card: #1a1a1a;
-    --text: #e5e5e5;
-    --text-light: #888;
-    --accent: #fff;
-    --border: #333;
+    --bg: #0a0a0a;
+    --bg-card: #ffffff;
+    --text: #1a1a1a;
+    --text-light: #666666;
+    --accent: #8b7355;
+    --border: #333333;
   }
 }
 
 body {
   background: var(--bg);
-  color: var(--text);
+  color: #e5e5e5;
   font-family: Georgia, "Times New Roman", Times, serif;
   line-height: 1.7;
   -webkit-font-smoothing: antialiased;
@@ -35,62 +35,135 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 a {
-  color: var(--text);
-  text-decoration: underline;
-  text-underline-offset: 2px;
+  color: var(--accent);
+  text-decoration: none;
 }
 
 a:hover {
-  color: var(--text-light);
+  text-decoration: underline;
 }
 
-::selection {
-  background: #333;
-  color: white;
+/* 顶部导航 */
+.nav-header {
+  background: linear-gradient(180deg, #1a1a1a 0%, #0a0a0a 100%);
+  border-bottom: 1px solid #333;
 }
 
-/* ========== 简洁卡片 ========== */
-.card {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
+/* 底部 */
+.nav-footer {
+  background: linear-gradient(180deg, #0a0a0a 0%, #1a1a1a 100%);
+  border-top: 1px solid #333;
 }
 
-/* ========== 文章内容 - 报纸风格 ========== */
-.article-content {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  color: var(--text);
+/* 文章卡片 - 白色光泽 */
+.article-card {
+  background: 
+    linear-gradient(145deg, #ffffff 0%, #f8f8f8 25%, #ffffff 50%, #fafafa 75%, #ffffff 100%);
+  box-shadow: 
+    0 4px 6px rgba(0, 0, 0, 0.3),
+    0 10px 20px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  position: relative;
 }
 
+/* 光泽效果 - 上 */
+.article-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 60px;
+  background: linear-gradient(180deg, 
+    rgba(255,255,255,0.8) 0%, 
+    rgba(255,255,255,0.3) 40%, 
+    transparent 100%);
+  pointer-events: none;
+  border-radius: 4px 4px 0 0;
+}
+
+/* 光泽效果 - 下 */
+.article-card::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 30px;
+  background: linear-gradient(0deg, 
+    rgba(255,255,255,0.3) 0%, 
+    transparent 100%);
+  pointer-events: none;
+  border-radius: 0 0 4px 4px;
+}
+
+/* 卡片内的文字 */
+.article-card .content {
+  color: #1a1a1a;
+  position: relative;
+  z-index: 1;
+}
+
+/* 标题区 */
+.article-card .title {
+  color: #1a1a1a;
+}
+
+.article-card .meta {
+  color: #666;
+}
+
+/* 首页文章列表卡片 */
+.post-card {
+  background: #141414;
+  border: 1px solid #2a2a2a;
+  transition: all 0.3s ease;
+}
+
+.post-card:hover {
+  border-color: var(--accent);
+  transform: translateY(-2px);
+}
+
+.post-card a {
+  color: #e5e5e5;
+}
+
+.post-card .post-title:hover {
+  color: var(--accent);
+}
+
+/* 富文本内容样式 */
 .rich-content {
   font-size: 18px;
-  line-height: 1.8;
-  position: relative;
-  z-index: 2;
+  line-height: 1.9;
 }
 
 .rich-content p {
   margin-bottom: 1.5em;
   text-align: justify;
   hyphens: auto;
+  color: #1a1a1a;
 }
 
 .rich-content h2 {
-  font-size: 1.6em;
-  margin: 2em 0 0.8em;
-  padding-bottom: 0.4em;
-  border-bottom: 1px solid var(--border);
-  font-weight: 600;
+  font-size: 1.5em;
+  margin: 1.8em 0 0.8em;
+  padding-bottom: 0.3em;
+  border-bottom: 1px solid #ddd;
+  color: #1a1a1a;
 }
 
 .rich-content h3 {
-  font-size: 1.3em;
-  margin: 1.8em 0 0.6em;
-  font-weight: 600;
+  font-size: 1.25em;
+  margin: 1.5em 0 0.6em;
+  color: #1a1a1a;
 }
 
 .rich-content strong {
   font-weight: 700;
+  color: #0a0a0a;
 }
 
 .rich-content em {
@@ -98,17 +171,18 @@ a:hover {
 }
 
 .rich-content blockquote {
-  border-left: 2px solid var(--text-light);
+  border-left: 3px solid var(--accent);
   padding: 0.5em 0 0.5em 1.2em;
   margin: 1.5em 0;
   font-style: italic;
-  color: var(--text-light);
+  color: #555;
+  background: rgba(0,0,0,0.02);
 }
 
 .rich-content hr {
   border: none;
   height: 1px;
-  background: var(--border);
+  background: linear-gradient(90deg, transparent, #ccc, transparent);
   margin: 2em 0;
 }
 
@@ -117,6 +191,7 @@ a:hover {
   height: auto;
   display: block;
   margin: 1.5em auto;
+  border-radius: 4px;
 }
 
 .rich-content video {
@@ -126,6 +201,11 @@ a:hover {
   margin: 1.5em auto;
 }
 
+.rich-content a {
+  color: #8b7355;
+  text-decoration: underline;
+}
+
 .rich-content ul, .rich-content ol {
   margin: 1em 0;
   padding-left: 1.5em;
@@ -133,20 +213,44 @@ a:hover {
 
 .rich-content li {
   margin-bottom: 0.5em;
+  color: #1a1a1a;
 }
 
-/* ========== 顶部导航 ========== */
-.nav-bar {
-  background: var(--bg-card);
-  border-bottom: 1px solid var(--border);
+/* 基督教装饰元素 */
+.cross-divider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin: 2em 0;
 }
 
-.nav-link {
-  text-decoration: none;
+.cross-divider::before,
+.cross-divider::after {
+  content: '✝';
   font-size: 14px;
-  letter-spacing: 0.5px;
+  color: #8b7355;
+  opacity: 0.5;
 }
 
-.nav-link:hover {
-  text-decoration: underline;
+.diamond-divider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin: 1.5em 0;
+}
+
+.diamond-divider::before,
+.diamond-divider::after {
+  content: '◆';
+  font-size: 6px;
+  color: #8b7355;
+  opacity: 0.4;
+}
+
+/* 登录页面 */
+.login-card {
+  background: #1a1a1a;
+  border: 1px solid #333;
 }

@@ -17,13 +17,13 @@ export default function RootLayout({
         <div className="min-h-screen flex flex-col" style={{ background: 'var(--bg)' }}>
           
           {/* 顶部导航 */}
-          <header style={{ background: 'var(--bg-card)', borderBottom: '1px solid var(--border)' }}>
+          <header className="nav-header">
             <div className="max-w-[720px] mx-auto px-6 py-4">
               <div className="flex justify-between items-center">
-                <a href="/" className="text-lg font-serif hover:opacity-70 transition-opacity" style={{ color: 'var(--text)' }}>
+                <a href="/" className="text-lg font-serif hover:opacity-70 transition-opacity" style={{ color: '#e5e5e5' }}>
                   Eirian's Thoughts
                 </a>
-                <nav className="flex gap-6 text-sm" style={{ color: 'var(--text-light)' }}>
+                <nav className="flex gap-6 text-sm" style={{ color: '#888' }}>
                   <a href="/" className="hover:opacity-70 transition-opacity">首页</a>
                   <a href="/admin" className="hover:opacity-70 transition-opacity">写文章</a>
                 </nav>
@@ -38,8 +38,13 @@ export default function RootLayout({
           </main>
 
           {/* 底部 */}
-          <footer className="py-8 text-center text-sm" style={{ borderTop: '1px solid var(--border)', color: 'var(--text-light)' }}>
-            <p>© {new Date().getFullYear()} Eirian</p>
+          <footer className="nav-footer py-8">
+            <div className="max-w-[720px] mx-auto px-6">
+              <div className="cross-divider text-center mb-4"></div>
+              <p className="text-center text-sm" style={{ color: '#666' }}>
+                © {new Date().getFullYear()} Eirian · Soli Deo Gloria
+              </p>
+            </div>
           </footer>
         </div>
       </body>

@@ -38,7 +38,7 @@ function renderContent(content: string) {
       elements.push(
         <figure key={index} className="my-8">
           <img src={imageMatch[2]} alt={imageMatch[1]} className="max-w-full h-auto" />
-          {imageMatch[1] && <figcaption className="text-sm mt-2 text-center" style={{ color: 'var(--text-light)' }}>{imageMatch[1]}</figcaption>}
+          {imageMatch[1] && <figcaption className="text-sm mt-2 text-center" style={{ color: '#666' }}>{imageMatch[1]}</figcaption>}
         </figure>
       );
       return;
@@ -82,8 +82,8 @@ export default async function PostPage({ params }: { params: Promise<{ id: strin
   if (!post) {
     return (
       <div className="text-center py-20">
-        <p className="mb-4" style={{ color: 'var(--text-light)' }}>文章不存在</p>
-        <Link href="/" style={{ color: 'var(--text)', textDecoration: 'underline' }}>
+        <p className="mb-4" style={{ color: '#888' }}>文章不存在</p>
+        <Link href="/" style={{ color: '#8b7355', textDecoration: 'underline' }}>
           返回首页
         </Link>
       </div>
@@ -96,14 +96,14 @@ export default async function PostPage({ params }: { params: Promise<{ id: strin
       <Link
         href="/"
         className="inline-block text-sm mb-8 hover:opacity-70"
-        style={{ color: 'var(--text-light)' }}
+        style={{ color: '#888' }}
       >
         ← 返回首页
       </Link>
 
-      {/* 文章头部 */}
-      <header className="mb-10">
-        <div className="flex items-center gap-3 mb-4 text-sm" style={{ color: 'var(--text-light)' }}>
+      {/* 文章头部 - 黑色背景上 */}
+      <header className="mb-8">
+        <div className="flex items-center gap-3 mb-4 text-sm" style={{ color: '#888' }}>
           <time>{post.date}</time>
           {post.tags.length > 0 && (
             <>
@@ -112,18 +112,23 @@ export default async function PostPage({ params }: { params: Promise<{ id: strin
             </>
           )}
         </div>
-        <h1 className="text-3xl md:text-4xl font-serif font-normal leading-tight" style={{ color: 'var(--text)' }}>
+        <h1 className="text-3xl md:text-4xl font-serif font-normal leading-tight" style={{ color: '#e5e5e5' }}>
           {post.title}
         </h1>
       </header>
 
-      {/* 文章内容 */}
-      <div className="rich-content article-content p-8 md:p-10">
-        {renderContent(post.content)}
+      {/* 文章内容 - 白色光泽卡片 */}
+      <div className="article-card p-8 md:p-10 rounded-lg">
+        <div className="content rich-content">
+          {renderContent(post.content)}
+        </div>
+        
+        {/* 底部装饰 */}
+        <div className="diamond-divider mt-10 pt-6"></div>
       </div>
 
       {/* 评论区 - Giscus */}
-      <div className="mt-12 pt-8" style={{ borderTop: '1px solid var(--border)' }}>
+      <div className="mt-10 pt-6" style={{ borderTop: '1px solid #333' }}>
         <script
           src="https://giscus.app/client.js"
           data-repo="Eirian-design/my-thoughts"
@@ -135,7 +140,7 @@ export default async function PostPage({ params }: { params: Promise<{ id: strin
           data-reactions-enabled="1"
           data-emit-metadata="0"
           data-input-position="bottom"
-          data-theme="preferred_color_scheme"
+          data-theme="dark"
           data-lang="zh-CN"
           crossOrigin="anonymous"
           async
@@ -146,7 +151,7 @@ export default async function PostPage({ params }: { params: Promise<{ id: strin
       <nav className="mt-10 text-center">
         <Link
           href="/"
-          style={{ color: 'var(--text)', textDecoration: 'underline' }}
+          style={{ color: '#888', textDecoration: 'underline' }}
         >
           ← 返回首页
         </Link>
