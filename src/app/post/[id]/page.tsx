@@ -5,6 +5,67 @@ export function generateStaticParams() {
   return posts.map((post) => ({ id: post.id }));
 }
 
+// 渲染富文本内容
+function renderContent(content: string) {
+  const lines = content.split("\n\n");
+  const elements: React.ReactNode[] = [];
+  
+  lines.forEach((line, index) => {
+    const trimmed = line.trim();
+    if (!trimmed) return;
+    
+    // 二级标题
+    if (trimmed.startsWith("## ")) {
+      elements.push(<h2 key={index}>{trimmed.slice(3)}</h2>);
+      return;
+    }
+    
+    // 三级标题
+    if (trimmed.startsWith("### ")) {
+      elements.push(<h3 key={index}>{trimmed.slice(4)}</h3>);
+      return;
+    }
+    
+    // 分割线
+    if (trimmed === "---") {
+      elements.push(<hr key={index} />);
+      return;
+    }
+    
+    // 图片 ![alt](url)
+    const imageMatch = trimmed.match(/^!\[(.*)\]\((.+)\)$/);
+    if (imageMatch) {
+      elements.push(
+        <figure key={index}>
+          <img src={imageMatch[2]} alt={imageMatch[1]} />
+          {imageMatch[1] && <figcaption>{imageMatch[1]}</figcaption>}
+        </figure>
+      );
+      return;
+    }
+    
+    // 视频 <video src="..."></video>
+    if (trimmed.startsWith("<video ")) {
+      const srcMatch = trimmed.match(/src="([^"]+)"/);
+      if (srcMatch) {
+        elements.push(<video key={index} src={srcMatch[1]} controls />);
+      }
+      return;
+    }
+    
+    // 引用 > text
+    if (trimmed.startsWith("> ")) {
+      elements.push(<blockquote key={index}>{trimmed.slice(2)}</blockquote>);
+      return;
+    }
+    
+    // 普通段落
+    elements.push(<p key={index}>{trimmed}</p>);
+  });
+  
+  return elements;
+}
+
 export default async function PostPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const post = posts.find((p) => p.id === id);
@@ -55,15 +116,11 @@ export default async function PostPage({ params }: { params: Promise<{ id: strin
       </header>
 
       {/* 文章内容 - 强光泽白底 + 纯黑字 */}
-      <div 
-        className="prose article-content p-10 relative"
-      >
+      <div className="rich-content article-content p-10 relative">
         {/* 左侧装饰线 */}
         <div className="side-line"></div>
         
-        {post.content.split("\n\n").map((paragraph, i) => (
-          <p key={i}>{paragraph}</p>
-        ))}
+        {renderContent(post.content)}
         
         {/* 底部窗花 */}
         <div className="text-center mt-12 pt-6" style={{ color: 'var(--gothic-gold)', opacity: 0.3 }}>❋</div>
