@@ -15,25 +15,24 @@ export default function RootLayout({
     <html lang="zh-CN">
       <body>
         <div className="min-h-screen flex flex-col" style={{ background: 'var(--bg)' }}>
-          {/* 顶部导航 - 哥特式双线 */}
-          <header className="border-b-4" style={{ borderColor: 'var(--border)' }}>
+          
+          {/* 顶部导航 - 黑色装饰区域 */}
+          <header className="dark-decoration">
             <div className="max-w-[720px] mx-auto px-6 py-5">
               <div className="flex justify-between items-center">
-                {/* 左侧：十字 + 标题 */}
                 <div className="flex items-center gap-4">
-                  <span className="text-xl" style={{ color: 'var(--border)' }}>✝</span>
-                  <a href="/" className="text-xl font-serif font-medium tracking-wide hover:opacity-70 transition-opacity" style={{ color: 'var(--text)' }}>
+                  {/* 哥特窗花 */}
+                  <span style={{ color: 'var(--gothic-gold)', opacity: 0.7 }}>❋</span>
+                  <a href="/" className="text-lg font-serif font-medium tracking-wide hover:opacity-70 transition-opacity">
                     Eirian's Thoughts
                   </a>
                 </div>
-                <nav className="flex gap-8 text-sm" style={{ color: 'var(--text-light)' }}>
-                  <a href="/" className="hover:opacity-70 transition-opacity" style={{ color: 'var(--text-light)' }}>首页</a>
-                  <a href="/admin" className="hover:opacity-70 transition-opacity" style={{ color: 'var(--text-light)' }}>写文章</a>
+                <nav className="flex gap-8 text-sm" style={{ opacity: 0.8 }}>
+                  <a href="/" className="hover:opacity-70 transition-opacity">首页</a>
+                  <a href="/admin" className="hover:opacity-70 transition-opacity">写文章</a>
                 </nav>
               </div>
             </div>
-            {/* 底部细线 */}
-            <div className="border-b" style={{ borderColor: 'var(--border)', opacity: 0.3 }}></div>
           </header>
 
           <main className="flex-1">
@@ -42,18 +41,14 @@ export default function RootLayout({
             </div>
           </main>
 
-          {/* 底部装饰 */}
-          <footer className="border-t-4 py-10" style={{ borderColor: 'var(--border)' }}>
+          {/* 底部装饰 - 黑色 */}
+          <footer className="dark-decoration py-8">
             <div className="max-w-[720px] mx-auto px-6">
-              {/* 哥特式玫瑰窗花 */}
-              <div className="gothic-rose mb-6"></div>
-              
-              <p className="text-center text-sm" style={{ color: 'var(--text-light)' }}>
+              {/* 玫瑰窗花 */}
+              <div className="text-center mb-4" style={{ color: 'var(--gothic-gold)', opacity: 0.5 }}>❋ ✝ ❋</div>
+              <p className="text-center text-sm" style={{ opacity: 0.7 }}>
                 © {new Date().getFullYear()} Eirian · Soli Deo Gloria
               </p>
-              
-              {/* 底部十字装饰 */}
-              <div className="cross-decoration mt-6"></div>
             </div>
           </footer>
         </div>

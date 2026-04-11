@@ -8,10 +8,10 @@ export default function Home() {
 
   return (
     <div className="space-y-10">
-      {/* 标题区 - 哥特式装饰 */}
+      {/* 标题区 */}
       <section className="text-center py-8 mb-12">
-        {/* 顶部十字装饰 */}
-        <div className="cross-decoration mb-6"></div>
+        {/* 顶部小窗花 */}
+        <div className="text-center mb-4" style={{ color: 'var(--gothic-gold)', opacity: 0.4 }}>✧</div>
         
         <p className="text-xs uppercase tracking-[0.25em] mb-3" style={{ color: 'var(--text-light)' }}>
           Personal Notes
@@ -20,24 +20,24 @@ export default function Home() {
           Eirian's Thoughts
         </h1>
         
-        {/* 底部菱形装饰 */}
+        {/* 底部菱形 */}
         <div className="gothic-divider mt-6">
-          <div className="gothic-divider-center" />
+          <div style={{ width: 6, height: 6, background: 'var(--border)', transform: 'rotate(45deg)', opacity: 0.6 }}></div>
         </div>
       </section>
 
-      {/* 文章列表 - 哥特式卡片 + 窗花 */}
+      {/* 文章列表 */}
       <section className="space-y-6">
         {sortedPosts.map((post) => (
           <article 
             key={post.id} 
-            className="gothic-card p-6 church-window"
+            className="gothic-card p-6 church-rose-small"
           >
             <div className="flex items-center gap-3 mb-3">
               <time className="text-sm" style={{ color: 'var(--text-light)' }}>{post.date}</time>
               {post.tags.length > 0 && (
                 <>
-                  <span style={{ color: 'var(--border)' }}>·</span>
+                  <span style={{ color: 'var(--border)', opacity: 0.5 }}>·</span>
                   <span className="text-sm" style={{ color: 'var(--text-light)' }}>
                     {post.tags.join(", ")}
                   </span>

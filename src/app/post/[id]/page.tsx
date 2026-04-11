@@ -25,22 +25,19 @@ export default async function PostPage({ params }: { params: Promise<{ id: strin
       {/* 返回链接 */}
       <Link
         href="/"
-        className="inline-flex items-center text-sm mb-10 hover:text-[var(--accent)] transition-colors"
+        className="inline-flex items-center text-sm mb-8 hover:text-[var(--accent)] transition-colors"
         style={{ color: 'var(--text-light)' }}
       >
         ← 返回首页
       </Link>
 
       {/* 文章头部 */}
-      <header className="mb-10">
-        {/* 顶部哥特式玫瑰窗花 */}
-        <div className="gothic-rose mb-6"></div>
-        
+      <header className="mb-8">
         <div className="flex items-center gap-3 mb-4">
           <time className="text-sm" style={{ color: 'var(--text-light)' }}>{post.date}</time>
           {post.tags.length > 0 && (
             <>
-              <span style={{ color: 'var(--border)' }}>·</span>
+              <span style={{ color: 'var(--border)', opacity: 0.5 }}>·</span>
               <span className="text-sm" style={{ color: 'var(--text-light)' }}>
                 {post.tags.join(", ")}
               </span>
@@ -53,32 +50,31 @@ export default async function PostPage({ params }: { params: Promise<{ id: strin
         
         {/* 底部装饰 */}
         <div className="gothic-divider mt-6">
-          <div className="gothic-divider-center" />
+          <div style={{ width: 6, height: 6, background: 'var(--border)', transform: 'rotate(45deg)', opacity: 0.6 }}></div>
         </div>
       </header>
 
-      {/* 文章内容 - 纯白反光背景 + 黑色字体 */}
+      {/* 文章内容 - 强光泽白底 + 纯黑字 */}
       <div 
         className="prose article-content p-10 relative"
-        style={{ position: 'relative' }}
       >
-        {/* 侧边装饰线 */}
-        <div className="side-decoration-left absolute left-0 top-0 bottom-0 w-3"></div>
+        {/* 左侧装饰线 */}
+        <div className="side-line"></div>
         
         {post.content.split("\n\n").map((paragraph, i) => (
           <p key={i}>{paragraph}</p>
         ))}
         
-        {/* 底部窗花装饰 */}
-        <div className="gothic-rose mt-12 pt-6" style={{ borderTop: '1px solid #e0e0e0' }}></div>
+        {/* 底部窗花 */}
+        <div className="text-center mt-12 pt-6" style={{ color: 'var(--gothic-gold)', opacity: 0.3 }}>❋</div>
       </div>
 
       {/* 底部导航 */}
-      <nav className="mt-10 pt-6">
-        <div className="cross-decoration mb-6"></div>
+      <nav className="mt-10 pt-6 text-center">
+        <div className="cross-decoration justify-center mb-6"></div>
         <Link
           href="/"
-          className="block text-center text-[var(--accent)] hover:underline"
+          className="text-[var(--accent)] hover:underline"
         >
           ← 返回首页
         </Link>
