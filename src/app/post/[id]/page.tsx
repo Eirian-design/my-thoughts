@@ -118,13 +118,13 @@ export default async function PostPage({ params }: { params: Promise<{ id: strin
       </header>
 
       {/* 文章内容 - 白色光泽卡片 */}
-      <div className="article-card p-8 md:p-10 rounded-lg">
+      <div className="article-card p-8 md:p-10 rounded-lg card-ornament-bottom">
         <div className="content rich-content">
           {renderContent(post.content)}
         </div>
         
         {/* 底部装饰 */}
-        <div className="diamond-divider mt-10 pt-6"></div>
+        <div className="cross-divider mt-10 pt-6"></div>
       </div>
 
       {/* 评论区 - Giscus */}

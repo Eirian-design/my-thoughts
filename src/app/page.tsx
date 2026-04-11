@@ -21,7 +21,7 @@ export default function Home() {
       {/* 文章列表 - 白色光泽卡片 */}
       <section className="space-y-6">
         {sortedPosts.map((post) => (
-          <article key={post.id} className="article-card p-6 rounded-lg">
+          <article key={post.id} className="article-card p-6 rounded-lg card-ornament-bottom">
             <div className="flex items-center gap-3 mb-3 text-sm" style={{ color: '#666' }}>
               <time>{post.date}</time>
               {post.tags.length > 0 && (
