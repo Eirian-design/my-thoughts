@@ -53,6 +53,15 @@ function renderContent(content: string) {
       return;
     }
     
+    // 音频 <audio src="..."></audio>
+    if (trimmed.startsWith("<audio ")) {
+      const srcMatch = trimmed.match(/src="([^"]+)"/);
+      if (srcMatch) {
+        elements.push(<audio key={index} src={srcMatch[1]} controls className="w-full my-4" />);
+      }
+      return;
+    }
+    
     // 引用 > text
     if (trimmed.startsWith("> ")) {
       elements.push(<blockquote key={index}>{trimmed.slice(2)}</blockquote>);

@@ -11,6 +11,7 @@ type ContentBlock =
   | { type: "heading3"; content: string }
   | { type: "image"; url: string; caption?: string }
   | { type: "video"; url: string }
+  | { type: "audio"; url: string }
   | { type: "divider" }
   | { type: "quote"; content: string };
 
@@ -55,6 +56,7 @@ export default function AdminPage() {
       type === "divider" ? { type: "divider" } :
       type === "image" ? { type: "image", url: "", caption: "" } :
       type === "video" ? { type: "video", url: "" } :
+      type === "audio" ? { type: "audio", url: "" } :
       { type: "paragraph", content: "" };
     
     const insertIndex = activeBlock !== null ? activeBlock + 1 : blocks.length;
@@ -97,6 +99,7 @@ export default function AdminPage() {
         if (block.type === "divider") return "---";
         if (block.type === "image") return `[图片: ${block.caption || block.url}]`;
         if (block.type === "video") return `[视频: ${block.url}]`;
+        if (block.type === "audio") return `[音频: ${block.url}]`;
         return block.content;
       })
       .join("\n\n");
@@ -111,6 +114,7 @@ export default function AdminPage() {
         if (block.type === "divider") return "---";
         if (block.type === "image") return `![${block.caption || ""}](${block.url})`;
         if (block.type === "video") return `<video src="${block.url}" controls></video>`;
+        if (block.type === "audio") return `<audio src="${block.url}" controls></audio>`;
         if (block.type === "quote") return `> ${block.content}`;
         return block.content;
       })
@@ -127,6 +131,91 @@ export default function AdminPage() {
       return data.sha;
     } catch {
       return null;
+    }
+  };
+
+  // 上传文件到 GitHub
+  const uploadFile = async (file: File, folder: string = "uploads"): Promise<string | null> => {
+    if (!githubToken) {
+      alert("请先填写 GitHub Token");
+      return null;
+    }
+
+    const ext = file.name.split(".").pop() || "";
+    const timestamp = Date.now();
+    const safeName = file.name.replace(/[^a-zA-Z0-9.-]/g, "_");
+    const fileName = `${timestamp}-${safeName}`;
+    const path = `public/${folder}/${fileName}`;
+
+    return new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onload = async () => {
+        try {
+          const base64 = (reader.result as string).split(",")[1];
+          const sha = await getFileSha(path);
+          
+          const body: Record<string, unknown> = {
+            message: `upload: ${fileName}`,
+            content: base64,
+          };
+          if (sha) body.sha = sha;
+
+          const res = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/contents/${path}`, {
+            method: "PUT",
+            headers: {
+              Authorization: `token ${githubToken}`,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(body),
+          });
+
+          if (res.ok) {
+            // 返回 CDN URL
+            const url = `https://eirian.top/${folder}/${fileName}`;
+            resolve(url);
+          } else {
+            console.error("Upload failed:", await res.text());
+            resolve(null);
+          }
+        } catch (err) {
+          console.error("Upload error:", err);
+          resolve(null);
+        }
+      };
+      reader.readAsDataURL(file);
+    });
+  };
+
+  // 处理图片上传
+  const handleImageUpload = async (index: number, e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const currentBlock = blocks[index] as { url?: string };
+    updateBlock(index, { ...currentBlock, url: "上传中..." } as ContentBlock);
+    const url = await uploadFile(file, "images");
+    if (url) {
+      updateBlock(index, { ...currentBlock, url } as ContentBlock);
+    } else {
+      updateBlock(index, { ...currentBlock, url: "" } as ContentBlock);
+      alert("上传失败，请重试");
+    }
+  };
+
+  // 处理视频/音频上传
+  const handleMediaUpload = async (index: number, e: React.ChangeEvent<HTMLInputElement>, type: "video" | "audio") => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const currentBlock = blocks[index] as { url?: string };
+    const folder = type === "video" ? "videos" : "audio";
+    updateBlock(index, { ...currentBlock, url: "上传中..." } as ContentBlock);
+    const url = await uploadFile(file, folder);
+    if (url) {
+      updateBlock(index, { ...currentBlock, url } as ContentBlock);
+    } else {
+      updateBlock(index, { ...currentBlock, url: "" } as ContentBlock);
+      alert("上传失败，请重试");
     }
   };
 
@@ -378,6 +467,14 @@ export default function AdminPage() {
           </button>
           <button
             type="button"
+            onClick={() => addBlock("audio")}
+            className="px-3 py-1 rounded text-sm hover:opacity-70"
+            style={{ background: 'var(--bg)', color: 'var(--text)' }}
+          >
+            🎵 音频
+          </button>
+          <button
+            type="button"
             onClick={() => addBlock("divider")}
             className="px-3 py-1 rounded text-sm hover:opacity-70"
             style={{ background: 'var(--bg)', color: 'var(--text)' }}
@@ -459,6 +556,7 @@ export default function AdminPage() {
                   <option value="heading3">三级标题</option>
                   <option value="image">图片</option>
                   <option value="video">视频</option>
+                  <option value="audio">音频</option>
                   <option value="divider">分割线</option>
                   <option value="quote">引用</option>
                 </select>
@@ -512,15 +610,26 @@ export default function AdminPage() {
               )}
               {block.type === "image" && (
                 <div className="space-y-2">
-                  <input
-                    type="url"
-                    value={block.url}
-                    onChange={(e) => updateBlock(index, { ...block, url: e.target.value })}
-                    onFocus={() => setActiveBlock(index)}
-                    placeholder="图片 URL（如 https://example.com/image.jpg）"
-                    className="w-full px-3 py-2 rounded border"
-                    style={{ borderColor: 'var(--border)', background: 'var(--bg-card)', color: 'var(--text)' }}
-                  />
+                  <div className="flex gap-2">
+                    <input
+                      type="url"
+                      value={block.url}
+                      onChange={(e) => updateBlock(index, { ...block, url: e.target.value })}
+                      onFocus={() => setActiveBlock(index)}
+                      placeholder="图片 URL"
+                      className="flex-1 px-3 py-2 rounded border"
+                      style={{ borderColor: 'var(--border)', background: 'var(--bg-card)', color: 'var(--text)' }}
+                    />
+                    <label className="px-4 py-2 rounded cursor-pointer text-sm text-white" style={{ background: 'var(--accent)' }}>
+                      📁 本地上传
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={(e) => handleImageUpload(index, e)}
+                        className="hidden"
+                      />
+                    </label>
+                  </div>
                   <input
                     type="text"
                     value={block.caption || ""}
@@ -529,24 +638,71 @@ export default function AdminPage() {
                     className="w-full px-3 py-2 rounded border text-sm"
                     style={{ borderColor: 'var(--border)', background: 'var(--bg-card)', color: 'var(--text-light)' }}
                   />
-                  {block.url && (
+                  {block.url && block.url !== "上传中..." && (
                     <img src={block.url} alt="" className="max-h-40 rounded border" style={{ borderColor: 'var(--border)' }} />
+                  )}
+                  {block.url === "上传中..." && (
+                    <p className="text-sm" style={{ color: 'var(--text-light)' }}>⏳ 上传中...</p>
                   )}
                 </div>
               )}
               {block.type === "video" && (
                 <div className="space-y-2">
-                  <input
-                    type="url"
-                    value={block.url}
-                    onChange={(e) => updateBlock(index, { ...block, url: e.target.value })}
-                    onFocus={() => setActiveBlock(index)}
-                    placeholder="视频 URL（如 https://example.com/video.mp4）"
-                    className="w-full px-3 py-2 rounded border"
-                    style={{ borderColor: 'var(--border)', background: 'var(--bg-card)', color: 'var(--text)' }}
-                  />
-                  {block.url && (
+                  <div className="flex gap-2">
+                    <input
+                      type="url"
+                      value={block.url}
+                      onChange={(e) => updateBlock(index, { ...block, url: e.target.value })}
+                      onFocus={() => setActiveBlock(index)}
+                      placeholder="视频 URL"
+                      className="flex-1 px-3 py-2 rounded border"
+                      style={{ borderColor: 'var(--border)', background: 'var(--bg-card)', color: 'var(--text)' }}
+                    />
+                    <label className="px-4 py-2 rounded cursor-pointer text-sm text-white" style={{ background: 'var(--accent)' }}>
+                      📁 上传
+                      <input
+                        type="file"
+                        accept="video/*"
+                        onChange={(e) => handleMediaUpload(index, e, "video")}
+                        className="hidden"
+                      />
+                    </label>
+                  </div>
+                  {block.url && block.url !== "上传中..." && (
                     <video src={block.url} controls className="max-h-48 rounded border" style={{ borderColor: 'var(--border)' }} />
+                  )}
+                  {block.url === "上传中..." && (
+                    <p className="text-sm" style={{ color: 'var(--text-light)' }}>⏳ 上传中...</p>
+                  )}
+                </div>
+              )}
+              {block.type === "audio" && (
+                <div className="space-y-2">
+                  <div className="flex gap-2">
+                    <input
+                      type="url"
+                      value={block.url}
+                      onChange={(e) => updateBlock(index, { ...block, url: e.target.value })}
+                      onFocus={() => setActiveBlock(index)}
+                      placeholder="音频 URL"
+                      className="flex-1 px-3 py-2 rounded border"
+                      style={{ borderColor: 'var(--border)', background: 'var(--bg-card)', color: 'var(--text)' }}
+                    />
+                    <label className="px-4 py-2 rounded cursor-pointer text-sm text-white" style={{ background: 'var(--accent)' }}>
+                      📁 上传
+                      <input
+                        type="file"
+                        accept="audio/*"
+                        onChange={(e) => handleMediaUpload(index, e, "audio")}
+                        className="hidden"
+                      />
+                    </label>
+                  </div>
+                  {block.url && block.url !== "上传中..." && (
+                    <audio src={block.url} controls className="w-full" />
+                  )}
+                  {block.url === "上传中..." && (
+                    <p className="text-sm" style={{ color: 'var(--text-light)' }}>⏳ 上传中...</p>
                   )}
                 </div>
               )}
