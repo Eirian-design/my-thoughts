@@ -14,30 +14,43 @@ export default function RootLayout({
   return (
     <html lang="zh-CN">
       <body>
-        <div className="min-h-screen flex flex-col">
-          {/* 顶部导航 - 简洁风格 */}
-          <header className="border-b border-[var(--border)] py-4">
-            <div className="max-w-[680px] mx-auto px-6 flex justify-between items-center">
-              <a href="/" className="text-lg font-bold tracking-tight hover:opacity-70 transition-opacity">
-                Eirian's Thoughts
-              </a>
-              <nav className="flex gap-6 text-sm text-[var(--text-light)]">
-                <a href="/" className="hover:text-[var(--text)] transition-colors">首页</a>
-                <a href="/admin" className="hover:text-[var(--text)] transition-colors">写文章</a>
-              </nav>
+        <div className="min-h-screen flex flex-col" style={{ background: 'var(--bg)' }}>
+          {/* 顶部导航 - 哥特式线条装饰 */}
+          <header className="border-b" style={{ borderColor: 'var(--border)', borderBottomWidth: '3px' }}>
+            <div className="max-w-[720px] mx-auto px-6 py-5">
+              <div className="flex justify-between items-center">
+                {/* 左侧：十字装饰 + 标题 */}
+                <div className="flex items-center gap-4">
+                  <span className="text-xl" style={{ color: 'var(--border)' }}>✝</span>
+                  <a href="/" className="text-xl font-serif font-medium tracking-wide hover:opacity-70 transition-opacity" style={{ color: 'var(--text)' }}>
+                    Eirian's Thoughts
+                  </a>
+                </div>
+                <nav className="flex gap-8 text-sm" style={{ color: 'var(--text-light)' }}>
+                  <a href="/" className="hover:opacity-70 transition-opacity" style={{ color: 'var(--text-light)' }}>首页</a>
+                  <a href="/admin" className="hover:opacity-70 transition-opacity" style={{ color: 'var(--text-light)' }}>写文章</a>
+                </nav>
+              </div>
             </div>
           </header>
 
           <main className="flex-1">
-            <div className="max-w-[680px] mx-auto px-6 py-12">
+            <div className="max-w-[720px] mx-auto px-6 py-12">
               {children}
             </div>
           </main>
 
-          <footer className="border-t border-[var(--border)] py-8 text-center">
-            <p className="text-sm text-[var(--text-light)]">
-              © {new Date().getFullYear()} Eirian. All rights reserved.
-            </p>
+          {/* 底部装饰 */}
+          <footer className="border-t py-10" style={{ borderColor: 'var(--border)', borderTopWidth: '1px' }}>
+            <div className="max-w-[720px] mx-auto px-6">
+              {/* 哥特式分隔线 */}
+              <div className="gothic-divider mb-6">
+                <div className="gothic-divider-center" />
+              </div>
+              <p className="text-center text-sm" style={{ color: 'var(--text-light)' }}>
+                © {new Date().getFullYear()} Eirian · Soli Deo Gloria
+              </p>
+            </div>
           </footer>
         </div>
       </body>

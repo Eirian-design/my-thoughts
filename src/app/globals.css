@@ -2,19 +2,23 @@
 
 :root {
   --bg: #fdfbf7;
+  --bg-card: #ffffff;
   --text: #1a1a1a;
-  --text-light: #5a5a5a;
-  --accent: #c41e3a;
-  --border: #e0e0e0;
+  --text-light: #666;
+  --accent: #8b0000;
+  --border: #2a2a2a;
+  --gothic: #1a1a1a;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --bg: #1a1a1a;
+    --bg: #0d0d0d;
+    --bg-card: #1a1a1a;
     --text: #e5e5e5;
-    --text-light: #a0a0a0;
-    --accent: #e85d75;
-    --border: #333;
+    --text-light: #999;
+    --accent: #c95050;
+    --border: #444;
+    --gothic: #e5e5e5;
   }
 }
 
@@ -22,18 +26,16 @@ body {
   background: var(--bg);
   color: var(--text);
   font-family: Georgia, "Times New Roman", Times, serif;
-  line-height: 1.75;
+  line-height: 1.8;
   -webkit-font-smoothing: antialiased;
 }
 
-/* 标题字体 */
 h1, h2, h3, h4, h5, h6 {
   font-family: Georgia, "Times New Roman", Times, serif;
   font-weight: 600;
   line-height: 1.3;
 }
 
-/* 链接样式 */
 a {
   color: var(--accent);
   text-decoration: none;
@@ -43,35 +45,127 @@ a:hover {
   text-decoration: underline;
 }
 
-/* 文章内容样式 */
+::selection {
+  background: var(--accent);
+  color: white;
+}
+
+/* 哥特式尖顶拱形装饰 */
+.gothic-arch {
+  position: relative;
+}
+
+.gothic-arch::before {
+  content: '';
+  position: absolute;
+  top: -20px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 40px;
+  height: 20px;
+  border: 2px solid var(--border);
+  border-bottom: none;
+  border-radius: 40px 40px 0 0;
+}
+
+/* 黑色装饰线条 */
+.gothic-divider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+
+.gothic-divider::before,
+.gothic-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+.gothic-divider-center {
+  width: 8px;
+  height: 8px;
+  background: var(--border);
+  transform: rotate(45deg);
+}
+
+/* 卡片阴影 - 哥特式深色 */
+.gothic-card {
+  background: var(--bg-card);
+  box-shadow: 
+    0 2px 8px rgba(0, 0, 0, 0.08),
+    0 8px 24px rgba(0, 0, 0, 0.04);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+}
+
+.gothic-card:hover {
+  box-shadow: 
+    0 4px 12px rgba(0, 0, 0, 0.12),
+    0 12px 32px rgba(0, 0, 0, 0.08);
+  transform: translateY(-2px);
+}
+
+/* 哥特式窗花装饰 - 四叶图案 */
+.gothic-window {
+  position: relative;
+  overflow: hidden;
+}
+
+.gothic-window::after {
+  content: '✦';
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  font-size: 12px;
+  color: var(--border);
+  opacity: 0.4;
+}
+
+/* 文章内容 - 阅读界面 */
+.prose {
+  font-size: 18px;
+}
+
 .prose p {
-  margin-bottom: 1.5em;
+  margin-bottom: 1.8em;
   text-align: justify;
   hyphens: auto;
 }
 
 .prose h2 {
-  font-size: 1.5em;
-  margin-top: 2em;
-  margin-bottom: 0.75em;
+  font-size: 1.6em;
+  margin-top: 2.5em;
+  margin-bottom: 1em;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 0.3em;
 }
 
 .prose h3 {
-  font-size: 1.25em;
-  margin-top: 1.5em;
-  margin-bottom: 0.5em;
+  font-size: 1.3em;
+  margin-top: 2em;
+  margin-bottom: 0.8em;
 }
 
+/* 哥特式引号装饰 */
 .prose blockquote {
   border-left: 3px solid var(--accent);
-  padding-left: 1em;
-  margin: 1.5em 0;
+  padding: 0.5em 0 0.5em 1.5em;
+  margin: 2em 0;
   font-style: italic;
   color: var(--text-light);
+  position: relative;
 }
 
-/* 选中文本样式 */
-::selection {
-  background: var(--accent);
-  color: white;
+.prose blockquote::before {
+  content: '“';
+  position: absolute;
+  left: -5px;
+  top: -10px;
+  font-size: 3em;
+  color: var(--border);
+  opacity: 0.2;
+  font-family: Georgia, serif;
 }

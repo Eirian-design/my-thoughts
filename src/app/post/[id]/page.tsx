@@ -21,45 +21,65 @@ export default async function PostPage({ params }: { params: Promise<{ id: strin
   }
 
   return (
-    <article className="max-w-[640px] mx-auto">
+    <article className="max-w-[680px] mx-auto">
       {/* 返回链接 */}
       <Link
         href="/"
-        className="inline-flex items-center text-sm text-[var(--text-light)] hover:text-[var(--text)] transition-colors mb-12"
+        className="inline-flex items-center text-sm mb-10 hover:text-[var(--accent)] transition-colors"
+        style={{ color: 'var(--text-light)' }}
       >
         ← 返回首页
       </Link>
 
-      {/* 文章头部 */}
-      <header className="mb-12 pb-8 border-b border-[var(--border)]">
+      {/* 文章头部 - 哥特式装饰 */}
+      <header className="mb-12 pb-8" style={{ borderBottom: '1px solid var(--border)' }}>
+        {/* 顶部装饰 */}
+        <div className="gothic-divider mb-6">
+          <div className="gothic-divider-center" />
+        </div>
+        
         <div className="flex items-center gap-3 mb-4">
-          <time className="text-sm text-[var(--text-light)]">{post.date}</time>
+          <time className="text-sm" style={{ color: 'var(--text-light)' }}>{post.date}</time>
           {post.tags.length > 0 && (
             <>
-              <span className="text-[var(--border)]">·</span>
-              <span className="text-sm text-[var(--text-light)]">
+              <span style={{ color: 'var(--border)' }}>·</span>
+              <span className="text-sm" style={{ color: 'var(--text-light)' }}>
                 {post.tags.join(", ")}
               </span>
             </>
           )}
         </div>
-        <h1 className="text-3xl md:text-4xl font-serif font-medium leading-tight">
+        <h1 className="text-3xl md:text-4xl font-serif font-medium leading-tight" style={{ color: 'var(--text)' }}>
           {post.title}
         </h1>
+        
+        {/* 底部装饰 */}
+        <div className="gothic-divider mt-6">
+          <div className="gothic-divider-center" />
+        </div>
       </header>
 
-      {/* 文章内容 */}
-      <div className="prose">
+      {/* 文章内容 - 白色背景黑色字体 */}
+      <div 
+        className="prose bg-white p-8 gothic-card"
+        style={{ 
+          background: 'var(--bg-card)',
+          color: 'var(--text)'
+        }}
+      >
         {post.content.split("\n\n").map((paragraph, i) => (
           <p key={i}>{paragraph}</p>
         ))}
       </div>
 
       {/* 底部导航 */}
-      <nav className="mt-16 pt-8 border-t border-[var(--border)]">
+      <nav className="mt-12 pt-8" style={{ borderTop: '1px solid var(--border)' }}>
+        <div className="gothic-divider">
+          <div className="gothic-divider-center" />
+        </div>
         <Link
           href="/"
-          className="text-[var(--accent)] hover:underline"
+          className="block text-center mt-6 text-[var(--accent)] hover:underline"
         >
           ← 返回首页
         </Link>
