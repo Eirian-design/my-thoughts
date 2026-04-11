@@ -98,20 +98,40 @@ a:hover {
   border-radius: 0 0 4px 4px;
 }
 
-/* 卡片内的文字 */
+/* 卡片内的文字 - 浮起效果 */
 .article-card .content {
   color: #1a1a1a;
   position: relative;
   z-index: 1;
+  text-shadow: 0 1px 1px rgba(255, 255, 255, 0.8);
 }
 
-/* 标题区 */
+/* 标题区 - 浮起效果 */
 .article-card .title {
   color: #1a1a1a;
+  text-shadow: 0 1px 1px rgba(255, 255, 255, 0.8);
 }
 
 .article-card .meta {
   color: #666;
+  text-shadow: 0 1px 1px rgba(255, 255, 255, 0.5);
+}
+
+/* 标题浮起效果 */
+.article-card h1,
+.article-card h2,
+.article-card h3 {
+  color: #1a1a1a;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.8);
+}
+
+/* 段落文字 - 轻微浮起 */
+.rich-content p {
+  margin-bottom: 1.5em;
+  text-align: justify;
+  hyphens: auto;
+  color: #1a1a1a;
+  text-shadow: 0 0.5px 0 rgba(255, 255, 255, 0.7);
 }
 
 /* 首页文章列表卡片 */
