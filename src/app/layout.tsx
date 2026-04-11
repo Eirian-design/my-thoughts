@@ -16,18 +16,14 @@ export default function RootLayout({
       <body>
         <div className="min-h-screen flex flex-col" style={{ background: 'var(--bg)' }}>
           
-          {/* 顶部导航 - 黑色装饰区域 */}
-          <header className="dark-decoration">
-            <div className="max-w-[720px] mx-auto px-6 py-5">
+          {/* 顶部导航 */}
+          <header style={{ background: 'var(--bg-card)', borderBottom: '1px solid var(--border)' }}>
+            <div className="max-w-[720px] mx-auto px-6 py-4">
               <div className="flex justify-between items-center">
-                <div className="flex items-center gap-4">
-                  {/* 哥特窗花 */}
-                  <span style={{ color: 'var(--gothic-gold)', opacity: 0.7 }}>❋</span>
-                  <a href="/" className="text-lg font-serif font-medium tracking-wide hover:opacity-70 transition-opacity">
-                    Eirian's Thoughts
-                  </a>
-                </div>
-                <nav className="flex gap-8 text-sm" style={{ opacity: 0.8 }}>
+                <a href="/" className="text-lg font-serif hover:opacity-70 transition-opacity" style={{ color: 'var(--text)' }}>
+                  Eirian's Thoughts
+                </a>
+                <nav className="flex gap-6 text-sm" style={{ color: 'var(--text-light)' }}>
                   <a href="/" className="hover:opacity-70 transition-opacity">首页</a>
                   <a href="/admin" className="hover:opacity-70 transition-opacity">写文章</a>
                 </nav>
@@ -36,20 +32,14 @@ export default function RootLayout({
           </header>
 
           <main className="flex-1">
-            <div className="max-w-[720px] mx-auto px-6 py-12">
+            <div className="max-w-[720px] mx-auto px-6 py-10">
               {children}
             </div>
           </main>
 
-          {/* 底部装饰 - 黑色 */}
-          <footer className="dark-decoration py-8">
-            <div className="max-w-[720px] mx-auto px-6">
-              {/* 玫瑰窗花 */}
-              <div className="text-center mb-4" style={{ color: 'var(--gothic-gold)', opacity: 0.5 }}>❋ ✝ ❋</div>
-              <p className="text-center text-sm" style={{ opacity: 0.7 }}>
-                © {new Date().getFullYear()} Eirian · Soli Deo Gloria
-              </p>
-            </div>
+          {/* 底部 */}
+          <footer className="py-8 text-center text-sm" style={{ borderTop: '1px solid var(--border)', color: 'var(--text-light)' }}>
+            <p>© {new Date().getFullYear()} Eirian</p>
           </footer>
         </div>
       </body>

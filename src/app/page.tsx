@@ -7,45 +7,32 @@ export default function Home() {
   );
 
   return (
-    <div className="space-y-10">
+    <div className="max-w-[720px] mx-auto">
       {/* 标题区 */}
-      <section className="text-center py-8 mb-12">
-        {/* 顶部小窗花 */}
-        <div className="text-center mb-4" style={{ color: 'var(--gothic-gold)', opacity: 0.4 }}>✧</div>
-        
-        <p className="text-xs uppercase tracking-[0.25em] mb-3" style={{ color: 'var(--text-light)' }}>
+      <header className="py-10 mb-8 border-b" style={{ borderColor: 'var(--border)' }}>
+        <p className="text-xs uppercase tracking-widest mb-2" style={{ color: 'var(--text-light)' }}>
           Personal Notes
         </p>
-        <h1 className="text-3xl font-serif font-medium tracking-tight" style={{ color: 'var(--text)' }}>
+        <h1 className="text-2xl font-serif font-normal" style={{ color: 'var(--text)' }}>
           Eirian's Thoughts
         </h1>
-        
-        {/* 底部菱形 */}
-        <div className="gothic-divider mt-6">
-          <div style={{ width: 6, height: 6, background: 'var(--border)', transform: 'rotate(45deg)', opacity: 0.6 }}></div>
-        </div>
-      </section>
+      </header>
 
       {/* 文章列表 */}
-      <section className="space-y-6">
+      <section className="space-y-8">
         {sortedPosts.map((post) => (
-          <article 
-            key={post.id} 
-            className="gothic-card p-6 church-rose-small"
-          >
-            <div className="flex items-center gap-3 mb-3">
-              <time className="text-sm" style={{ color: 'var(--text-light)' }}>{post.date}</time>
+          <article key={post.id} className="pb-8" style={{ borderBottom: '1px solid var(--border)' }}>
+            <div className="flex items-center gap-3 mb-2 text-sm" style={{ color: 'var(--text-light)' }}>
+              <time>{post.date}</time>
               {post.tags.length > 0 && (
                 <>
-                  <span style={{ color: 'var(--border)', opacity: 0.5 }}>·</span>
-                  <span className="text-sm" style={{ color: 'var(--text-light)' }}>
-                    {post.tags.join(", ")}
-                  </span>
+                  <span style={{ opacity: 0.5 }}>·</span>
+                  <span>{post.tags.join(", ")}</span>
                 </>
               )}
             </div>
             <Link href={`/post/${post.id}`} className="block group">
-              <h2 className="text-xl font-serif font-medium mb-3 group-hover:text-[var(--accent)] transition-colors" style={{ color: 'var(--text)' }}>
+              <h2 className="text-xl font-serif font-normal mb-2 group-hover:opacity-70 transition-opacity" style={{ color: 'var(--text)' }}>
                 {post.title}
               </h2>
               <p className="text-base leading-relaxed" style={{ color: 'var(--text-light)' }}>
@@ -55,6 +42,11 @@ export default function Home() {
           </article>
         ))}
       </section>
+
+      {/* 底部 */}
+      <footer className="py-8 mt-8 text-center text-sm" style={{ color: 'var(--text-light)' }}>
+        <p>© {new Date().getFullYear()} Eirian</p>
+      </footer>
     </div>
   );
 }

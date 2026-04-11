@@ -36,9 +36,9 @@ function renderContent(content: string) {
     const imageMatch = trimmed.match(/^!\[(.*)\]\((.+)\)$/);
     if (imageMatch) {
       elements.push(
-        <figure key={index}>
-          <img src={imageMatch[2]} alt={imageMatch[1]} />
-          {imageMatch[1] && <figcaption>{imageMatch[1]}</figcaption>}
+        <figure key={index} className="my-8">
+          <img src={imageMatch[2]} alt={imageMatch[1]} className="max-w-full h-auto" />
+          {imageMatch[1] && <figcaption className="text-sm mt-2 text-center" style={{ color: 'var(--text-light)' }}>{imageMatch[1]}</figcaption>}
         </figure>
       );
       return;
@@ -48,7 +48,7 @@ function renderContent(content: string) {
     if (trimmed.startsWith("<video ")) {
       const srcMatch = trimmed.match(/src="([^"]+)"/);
       if (srcMatch) {
-        elements.push(<video key={index} src={srcMatch[1]} controls />);
+        elements.push(<video key={index} src={srcMatch[1]} controls className="max-w-full h-auto my-6" />);
       }
       return;
     }
@@ -73,8 +73,8 @@ export default async function PostPage({ params }: { params: Promise<{ id: strin
   if (!post) {
     return (
       <div className="text-center py-20">
-        <p className="text-[var(--text-light)] mb-4">文章不存在</p>
-        <Link href="/" className="text-[var(--accent)] hover:underline">
+        <p className="mb-4" style={{ color: 'var(--text-light)' }}>文章不存在</p>
+        <Link href="/" style={{ color: 'var(--text)', textDecoration: 'underline' }}>
           返回首页
         </Link>
       </div>
@@ -82,56 +82,62 @@ export default async function PostPage({ params }: { params: Promise<{ id: strin
   }
 
   return (
-    <article className="max-w-[720px] mx-auto">
+    <article className="max-w-[720px] mx-auto pb-16">
       {/* 返回链接 */}
       <Link
         href="/"
-        className="inline-flex items-center text-sm mb-8 hover:text-[var(--accent)] transition-colors"
+        className="inline-block text-sm mb-8 hover:opacity-70"
         style={{ color: 'var(--text-light)' }}
       >
         ← 返回首页
       </Link>
 
       {/* 文章头部 */}
-      <header className="mb-8">
-        <div className="flex items-center gap-3 mb-4">
-          <time className="text-sm" style={{ color: 'var(--text-light)' }}>{post.date}</time>
+      <header className="mb-10">
+        <div className="flex items-center gap-3 mb-4 text-sm" style={{ color: 'var(--text-light)' }}>
+          <time>{post.date}</time>
           {post.tags.length > 0 && (
             <>
-              <span style={{ color: 'var(--border)', opacity: 0.5 }}>·</span>
-              <span className="text-sm" style={{ color: 'var(--text-light)' }}>
-                {post.tags.join(", ")}
-              </span>
+              <span style={{ opacity: 0.5 }}>·</span>
+              <span>{post.tags.join(", ")}</span>
             </>
           )}
         </div>
-        <h1 className="text-3xl md:text-4xl font-serif font-medium leading-tight" style={{ color: 'var(--text)' }}>
+        <h1 className="text-3xl md:text-4xl font-serif font-normal leading-tight" style={{ color: 'var(--text)' }}>
           {post.title}
         </h1>
-        
-        {/* 底部装饰 */}
-        <div className="gothic-divider mt-6">
-          <div style={{ width: 6, height: 6, background: 'var(--border)', transform: 'rotate(45deg)', opacity: 0.6 }}></div>
-        </div>
       </header>
 
-      {/* 文章内容 - 强光泽白底 + 纯黑字 */}
-      <div className="rich-content article-content p-10 relative">
-        {/* 左侧装饰线 */}
-        <div className="side-line"></div>
-        
+      {/* 文章内容 */}
+      <div className="rich-content article-content p-8 md:p-10">
         {renderContent(post.content)}
-        
-        {/* 底部窗花 */}
-        <div className="text-center mt-12 pt-6" style={{ color: 'var(--gothic-gold)', opacity: 0.3 }}>❋</div>
+      </div>
+
+      {/* 评论区 - Giscus */}
+      <div className="mt-12 pt-8" style={{ borderTop: '1px solid var(--border)' }}>
+        <script
+          src="https://giscus.app/client.js"
+          data-repo="Eirian-design/my-thoughts"
+          data-repo-id="R_kgDOExample="
+          data-category="Announcements"
+          data-category-id="DIC_kwDOExample="
+          data-mapping="pathname"
+          data-strict="0"
+          data-reactions-enabled="1"
+          data-emit-metadata="0"
+          data-input-position="bottom"
+          data-theme="preferred_color_scheme"
+          data-lang="zh-CN"
+          crossOrigin="anonymous"
+          async
+        />
       </div>
 
       {/* 底部导航 */}
-      <nav className="mt-10 pt-6 text-center">
-        <div className="cross-decoration justify-center mb-6"></div>
+      <nav className="mt-10 text-center">
         <Link
           href="/"
-          className="text-[var(--accent)] hover:underline"
+          style={{ color: 'var(--text)', textDecoration: 'underline' }}
         >
           ← 返回首页
         </Link>
