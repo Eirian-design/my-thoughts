@@ -64,9 +64,9 @@ export default function AdminPage() {
     setActiveBlock(insertIndex);
   };
 
-  const updateBlock = (index: number, block: ContentBlock) => {
+  const updateBlock = (index: number, block: Partial<ContentBlock> & { type: ContentBlock["type"] }) => {
     const newBlocks = [...blocks];
-    newBlocks[index] = block;
+    newBlocks[index] = block as ContentBlock;
     setBlocks(newBlocks);
   };
 
