@@ -320,7 +320,7 @@ export default function AdminPage() {
           onSubmit={handleLogin}
           className="card p-8 rounded-xl w-full max-w-md"
         >
-          <h1 className="text-2xl font-serif text-center mb-6" style={{ color: 'var(--text)' }}>
+          <h1 className="text-2xl font-serif text-center mb-6" style={{ color: '#e5e5e5' }}>
             管理后台
           </h1>
           <input
@@ -329,7 +329,7 @@ export default function AdminPage() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             className="w-full px-4 py-3 rounded-lg border mb-4"
-            style={{ borderColor: 'var(--border)', background: 'var(--bg-card)', color: 'var(--text)' }}
+            style={{ borderColor: 'var(--border)', background: 'var(--bg-card)', color: '#e5e5e5' }}
           />
           <button
             type="submit"
@@ -346,11 +346,11 @@ export default function AdminPage() {
   return (
     <div className="max-w-4xl mx-auto pb-20">
       <div className="flex items-center justify-between mb-8">
-        <h1 className="text-2xl font-serif" style={{ color: 'var(--text)' }}>撰写新文章</h1>
+        <h1 className="text-2xl font-serif" style={{ color: '#e5e5e5' }}>撰写新文章</h1>
         <button
           onClick={() => setIsLoggedIn(false)}
           className="text-sm hover:opacity-70"
-          style={{ color: 'var(--text-light)' }}
+          style={{ color: '#888888' }}
         >
           退出登录
         </button>
@@ -358,7 +358,7 @@ export default function AdminPage() {
 
       {/* GitHub Token 设置 */}
       <div className="card rounded-lg p-4 mb-6" style={{ borderLeft: '3px solid var(--accent)' }}>
-        <label className="block text-sm mb-2" style={{ color: 'var(--text)' }}>🔑 GitHub Token（自动发布用）</label>
+        <label className="block text-sm mb-2" style={{ color: '#e5e5e5' }}>🔑 GitHub Token（自动发布用）</label>
         <div className="flex gap-2">
           <input
             type="password"
@@ -366,7 +366,7 @@ export default function AdminPage() {
             onChange={(e) => setGithubToken(e.target.value)}
             placeholder="粘贴你的 GitHub Token"
             className="flex-1 px-4 py-2 rounded-lg border"
-            style={{ borderColor: 'var(--border)', background: 'var(--bg-card)', color: 'var(--text)' }}
+            style={{ borderColor: 'var(--border)', background: 'var(--bg-card)', color: '#e5e5e5' }}
           />
           <button
             onClick={saveToken}
@@ -376,7 +376,7 @@ export default function AdminPage() {
             保存
           </button>
         </div>
-        <p className="text-xs mt-1" style={{ color: 'var(--text-light)' }}>
+        <p className="text-xs mt-1" style={{ color: '#888888' }}>
           Token 需要 repo 权限。保存后会保存在浏览器本地。
         </p>
       </div>
@@ -384,60 +384,60 @@ export default function AdminPage() {
       <form onSubmit={handlePublish} className="space-y-6">
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm mb-2" style={{ color: 'var(--text-light)' }}>标题 *</label>
+            <label className="block text-sm mb-2" style={{ color: '#888888' }}>标题 *</label>
             <input
               type="text"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="输入文章标题"
               className="w-full px-4 py-3 rounded-lg border"
-              style={{ borderColor: 'var(--border)', background: 'var(--bg-card)', color: 'var(--text)' }}
+              style={{ borderColor: 'var(--border)', background: 'var(--bg-card)', color: '#e5e5e5' }}
             />
           </div>
           <div>
-            <label className="block text-sm mb-2" style={{ color: 'var(--text-light)' }}>发布日期</label>
+            <label className="block text-sm mb-2" style={{ color: '#888888' }}>发布日期</label>
             <input
               type="date"
               value={date}
               onChange={(e) => setDate(e.target.value)}
               className="w-full px-4 py-3 rounded-lg border"
-              style={{ borderColor: 'var(--border)', background: 'var(--bg-card)', color: 'var(--text)' }}
+              style={{ borderColor: 'var(--border)', background: 'var(--bg-card)', color: '#e5e5e5' }}
             />
           </div>
         </div>
 
         <div>
-          <label className="block text-sm mb-2" style={{ color: 'var(--text-light)' }}>摘要</label>
+          <label className="block text-sm mb-2" style={{ color: '#888888' }}>摘要</label>
           <input
             type="text"
             value={excerpt}
             onChange={(e) => setExcerpt(e.target.value)}
             placeholder="简短描述（可选）"
             className="w-full px-4 py-3 rounded-lg border"
-            style={{ borderColor: 'var(--border)', background: 'var(--bg-card)', color: 'var(--text)' }}
+            style={{ borderColor: 'var(--border)', background: 'var(--bg-card)', color: '#e5e5e5' }}
           />
         </div>
 
         <div>
-          <label className="block text-sm mb-2" style={{ color: 'var(--text-light)' }}>标签（用逗号分隔）</label>
+          <label className="block text-sm mb-2" style={{ color: '#888888' }}>标签（用逗号分隔）</label>
           <input
             type="text"
             value={tags}
             onChange={(e) => setTags(e.target.value)}
             placeholder="如：随笔, 思考, 写作"
             className="w-full px-4 py-3 rounded-lg border"
-            style={{ borderColor: 'var(--border)', background: 'var(--bg-card)', color: 'var(--text)' }}
+            style={{ borderColor: 'var(--border)', background: 'var(--bg-card)', color: '#e5e5e5' }}
           />
         </div>
 
         {/* 富文本工具栏 */}
         <div className="card rounded-lg p-3 flex flex-wrap gap-2" style={{ background: 'var(--bg-card)' }}>
-          <span className="text-xs mr-2" style={{ color: 'var(--text-light)' }}>插入:</span>
+          <span className="text-xs mr-2" style={{ color: '#888888' }}>插入:</span>
           <button
             type="button"
             onClick={() => addBlock("heading2")}
             className="px-3 py-1 rounded text-sm font-bold hover:opacity-70"
-            style={{ background: 'var(--bg)', color: 'var(--text)' }}
+            style={{ background: 'var(--bg)', color: '#e5e5e5' }}
           >
             H2
           </button>
@@ -445,7 +445,7 @@ export default function AdminPage() {
             type="button"
             onClick={() => addBlock("heading3")}
             className="px-3 py-1 rounded text-sm font-bold hover:opacity-70"
-            style={{ background: 'var(--bg)', color: 'var(--text)' }}
+            style={{ background: 'var(--bg)', color: '#e5e5e5' }}
           >
             H3
           </button>
@@ -453,7 +453,7 @@ export default function AdminPage() {
             type="button"
             onClick={() => addBlock("image")}
             className="px-3 py-1 rounded text-sm hover:opacity-70"
-            style={{ background: 'var(--bg)', color: 'var(--text)' }}
+            style={{ background: 'var(--bg)', color: '#e5e5e5' }}
           >
             🖼️ 图片
           </button>
@@ -461,7 +461,7 @@ export default function AdminPage() {
             type="button"
             onClick={() => addBlock("video")}
             className="px-3 py-1 rounded text-sm hover:opacity-70"
-            style={{ background: 'var(--bg)', color: 'var(--text)' }}
+            style={{ background: 'var(--bg)', color: '#e5e5e5' }}
           >
             🎬 视频
           </button>
@@ -469,7 +469,7 @@ export default function AdminPage() {
             type="button"
             onClick={() => addBlock("audio")}
             className="px-3 py-1 rounded text-sm hover:opacity-70"
-            style={{ background: 'var(--bg)', color: 'var(--text)' }}
+            style={{ background: 'var(--bg)', color: '#e5e5e5' }}
           >
             🎵 音频
           </button>
@@ -477,7 +477,7 @@ export default function AdminPage() {
             type="button"
             onClick={() => addBlock("divider")}
             className="px-3 py-1 rounded text-sm hover:opacity-70"
-            style={{ background: 'var(--bg)', color: 'var(--text)' }}
+            style={{ background: 'var(--bg)', color: '#e5e5e5' }}
           >
             ➖ 分割线
           </button>
@@ -485,7 +485,7 @@ export default function AdminPage() {
             type="button"
             onClick={() => addBlock("quote")}
             className="px-3 py-1 rounded text-sm hover:opacity-70"
-            style={{ background: 'var(--bg)', color: 'var(--text)' }}
+            style={{ background: 'var(--bg)', color: '#e5e5e5' }}
           >
             ❝ 引用
           </button>
@@ -493,7 +493,7 @@ export default function AdminPage() {
             type="button"
             onClick={() => addBlock("paragraph")}
             className="px-3 py-1 rounded text-sm hover:opacity-70"
-            style={{ background: 'var(--bg)', color: 'var(--text)' }}
+            style={{ background: 'var(--bg)', color: '#e5e5e5' }}
           >
             📝 文本
           </button>
@@ -515,7 +515,7 @@ export default function AdminPage() {
                   type="button"
                   onClick={() => moveBlock(index, "up")}
                   className="w-8 h-8 rounded hover:opacity-70 flex items-center justify-center"
-                  style={{ background: 'var(--bg-card)', color: 'var(--text-light)' }}
+                  style={{ background: 'var(--bg-card)', color: '#888888' }}
                   title="上移"
                 >
                   ↑
@@ -524,7 +524,7 @@ export default function AdminPage() {
                   type="button"
                   onClick={() => moveBlock(index, "down")}
                   className="w-8 h-8 rounded hover:opacity-70 flex items-center justify-center"
-                  style={{ background: 'var(--bg-card)', color: 'var(--text-light)' }}
+                  style={{ background: 'var(--bg-card)', color: '#888888' }}
                   title="下移"
                 >
                   ↓
@@ -549,7 +549,7 @@ export default function AdminPage() {
                     updateBlock(index, { ...block, type: newType });
                   }}
                   className="text-xs px-2 py-1 rounded border"
-                  style={{ borderColor: 'var(--border)', background: 'var(--bg)', color: 'var(--text-light)' }}
+                  style={{ borderColor: 'var(--border)', background: 'var(--bg)', color: '#888888' }}
                 >
                   <option value="paragraph">文本段落</option>
                   <option value="heading2">二级标题</option>
@@ -560,7 +560,7 @@ export default function AdminPage() {
                   <option value="divider">分割线</option>
                   <option value="quote">引用</option>
                 </select>
-                <span className="text-xs" style={{ color: 'var(--text-light)' }}>#{index + 1}</span>
+                <span className="text-xs" style={{ color: '#888888' }}>#{index + 1}</span>
               </div>
 
               {/* 块内容编辑 */}
@@ -572,7 +572,7 @@ export default function AdminPage() {
                   placeholder="在这里输入文本..."
                   rows={3}
                   className="w-full px-3 py-2 rounded border resize-y"
-                  style={{ borderColor: 'var(--border)', background: 'var(--bg-card)', color: 'var(--text)' }}
+                  style={{ borderColor: 'var(--border)', background: 'var(--bg-card)', color: '#e5e5e5' }}
                 />
               )}
               {block.type === "heading2" && (
@@ -583,7 +583,7 @@ export default function AdminPage() {
                   onFocus={() => setActiveBlock(index)}
                   placeholder="二级标题..."
                   className="w-full px-3 py-2 rounded border text-lg font-bold"
-                  style={{ borderColor: 'var(--border)', background: 'var(--bg-card)', color: 'var(--text)' }}
+                  style={{ borderColor: 'var(--border)', background: 'var(--bg-card)', color: '#e5e5e5' }}
                 />
               )}
               {block.type === "heading3" && (
@@ -594,7 +594,7 @@ export default function AdminPage() {
                   onFocus={() => setActiveBlock(index)}
                   placeholder="三级标题..."
                   className="w-full px-3 py-2 rounded border text-base font-bold"
-                  style={{ borderColor: 'var(--border)', background: 'var(--bg-card)', color: 'var(--text)' }}
+                  style={{ borderColor: 'var(--border)', background: 'var(--bg-card)', color: '#e5e5e5' }}
                 />
               )}
               {block.type === "quote" && (
@@ -605,7 +605,7 @@ export default function AdminPage() {
                   placeholder="引用内容..."
                   rows={2}
                   className="w-full px-3 py-2 rounded border italic"
-                  style={{ borderColor: 'var(--border)', background: 'var(--bg-card)', color: 'var(--text-light)' }}
+                  style={{ borderColor: 'var(--border)', background: 'var(--bg-card)', color: '#888888' }}
                 />
               )}
               {block.type === "image" && (
@@ -618,7 +618,7 @@ export default function AdminPage() {
                       onFocus={() => setActiveBlock(index)}
                       placeholder="图片 URL"
                       className="flex-1 px-3 py-2 rounded border"
-                      style={{ borderColor: 'var(--border)', background: 'var(--bg-card)', color: 'var(--text)' }}
+                      style={{ borderColor: 'var(--border)', background: 'var(--bg-card)', color: '#e5e5e5' }}
                     />
                     <label className="px-4 py-2 rounded cursor-pointer text-sm text-white" style={{ background: 'var(--accent)' }}>
                       📁 本地上传
@@ -636,13 +636,13 @@ export default function AdminPage() {
                     onChange={(e) => updateBlock(index, { ...block, caption: e.target.value })}
                     placeholder="图片说明（可选）"
                     className="w-full px-3 py-2 rounded border text-sm"
-                    style={{ borderColor: 'var(--border)', background: 'var(--bg-card)', color: 'var(--text-light)' }}
+                    style={{ borderColor: 'var(--border)', background: 'var(--bg-card)', color: '#888888' }}
                   />
                   {block.url && block.url !== "上传中..." && (
                     <img src={block.url} alt="" className="max-h-40 rounded border" style={{ borderColor: 'var(--border)' }} />
                   )}
                   {block.url === "上传中..." && (
-                    <p className="text-sm" style={{ color: 'var(--text-light)' }}>⏳ 上传中...</p>
+                    <p className="text-sm" style={{ color: '#888888' }}>⏳ 上传中...</p>
                   )}
                 </div>
               )}
@@ -656,7 +656,7 @@ export default function AdminPage() {
                       onFocus={() => setActiveBlock(index)}
                       placeholder="视频 URL"
                       className="flex-1 px-3 py-2 rounded border"
-                      style={{ borderColor: 'var(--border)', background: 'var(--bg-card)', color: 'var(--text)' }}
+                      style={{ borderColor: 'var(--border)', background: 'var(--bg-card)', color: '#e5e5e5' }}
                     />
                     <label className="px-4 py-2 rounded cursor-pointer text-sm text-white" style={{ background: 'var(--accent)' }}>
                       📁 上传
@@ -672,7 +672,7 @@ export default function AdminPage() {
                     <video src={block.url} controls className="max-h-48 rounded border" style={{ borderColor: 'var(--border)' }} />
                   )}
                   {block.url === "上传中..." && (
-                    <p className="text-sm" style={{ color: 'var(--text-light)' }}>⏳ 上传中...</p>
+                    <p className="text-sm" style={{ color: '#888888' }}>⏳ 上传中...</p>
                   )}
                 </div>
               )}
@@ -686,7 +686,7 @@ export default function AdminPage() {
                       onFocus={() => setActiveBlock(index)}
                       placeholder="音频 URL"
                       className="flex-1 px-3 py-2 rounded border"
-                      style={{ borderColor: 'var(--border)', background: 'var(--bg-card)', color: 'var(--text)' }}
+                      style={{ borderColor: 'var(--border)', background: 'var(--bg-card)', color: '#e5e5e5' }}
                     />
                     <label className="px-4 py-2 rounded cursor-pointer text-sm text-white" style={{ background: 'var(--accent)' }}>
                       📁 上传
@@ -702,12 +702,12 @@ export default function AdminPage() {
                     <audio src={block.url} controls className="w-full" />
                   )}
                   {block.url === "上传中..." && (
-                    <p className="text-sm" style={{ color: 'var(--text-light)' }}>⏳ 上传中...</p>
+                    <p className="text-sm" style={{ color: '#888888' }}>⏳ 上传中...</p>
                   )}
                 </div>
               )}
               {block.type === "divider" && (
-                <div className="py-4 text-center" style={{ color: 'var(--text-light)' }}>
+                <div className="py-4 text-center" style={{ color: '#888888' }}>
                   <hr style={{ border: 'none', height: '1px', background: 'linear-gradient(90deg, transparent, #ccc, transparent)' }} />
                   <span className="text-xs mt-2 block">— 分割线 —</span>
                 </div>
@@ -721,7 +721,7 @@ export default function AdminPage() {
           type="button"
           onClick={() => addBlock("paragraph")}
           className="w-full py-3 rounded-lg border-2 border-dashed"
-          style={{ borderColor: 'var(--border)', color: 'var(--text-light)' }}
+          style={{ borderColor: 'var(--border)', color: '#888888' }}
         >
           + 添加内容块
         </button>
