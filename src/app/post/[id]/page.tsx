@@ -118,9 +118,9 @@ export default async function PostPage({ params }: { params: Promise<{ id: strin
         <script
           src="https://giscus.app/client.js"
           data-repo="Eirian-design/my-thoughts"
-          data-repo-id="R_kgDOExample="
+          data-repo-id="R_kgDOR-3s6g"
           data-category="Announcements"
-          data-category-id="DIC_kwDOExample="
+          data-category-id="DIC_kwDOR-3s6s4C6mNC"
           data-mapping="pathname"
           data-strict="0"
           data-reactions-enabled="1"
