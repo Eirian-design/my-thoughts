@@ -8,28 +8,30 @@ export default function Home() {
 
   return (
     <div className="space-y-10">
-      {/* 标题区 - 哥特式分隔 */}
+      {/* 标题区 - 哥特式装饰 */}
       <section className="text-center py-8 mb-12">
-        <div className="gothic-divider mb-6">
-          <div className="gothic-divider-center" />
-        </div>
+        {/* 顶部十字装饰 */}
+        <div className="cross-decoration mb-6"></div>
+        
         <p className="text-xs uppercase tracking-[0.25em] mb-3" style={{ color: 'var(--text-light)' }}>
           Personal Notes
         </p>
         <h1 className="text-3xl font-serif font-medium tracking-tight" style={{ color: 'var(--text)' }}>
           Eirian's Thoughts
         </h1>
+        
+        {/* 底部菱形装饰 */}
         <div className="gothic-divider mt-6">
           <div className="gothic-divider-center" />
         </div>
       </section>
 
-      {/* 文章列表 - 哥特式卡片 */}
+      {/* 文章列表 - 哥特式卡片 + 窗花 */}
       <section className="space-y-6">
         {sortedPosts.map((post) => (
           <article 
             key={post.id} 
-            className="gothic-card p-6 gothic-window"
+            className="gothic-card p-6 church-window"
           >
             <div className="flex items-center gap-3 mb-3">
               <time className="text-sm" style={{ color: 'var(--text-light)' }}>{post.date}</time>

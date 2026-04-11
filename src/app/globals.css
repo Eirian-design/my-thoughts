@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 :root {
-  --bg: #fdfbf7;
+  --bg: #f8f6f2;
   --bg-card: #ffffff;
   --text: #1a1a1a;
   --text-light: #666;
@@ -50,25 +50,9 @@ a:hover {
   color: white;
 }
 
-/* 哥特式尖顶拱形装饰 */
-.gothic-arch {
-  position: relative;
-}
+/* ========== 哥特式装饰元素 ========== */
 
-.gothic-arch::before {
-  content: '';
-  position: absolute;
-  top: -20px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 40px;
-  height: 20px;
-  border: 2px solid var(--border);
-  border-bottom: none;
-  border-radius: 40px 40px 0 0;
-}
-
-/* 黑色装饰线条 */
+/* 菱形中心装饰 */
 .gothic-divider {
   display: flex;
   align-items: center;
@@ -78,53 +62,152 @@ a:hover {
 
 .gothic-divider::before,
 .gothic-divider::after {
-  content: '';
-  flex: 1;
-  height: 1px;
-  background: var(--border);
+  content: '✦';
+  font-size: 8px;
+  color: var(--border);
 }
 
 .gothic-divider-center {
-  width: 8px;
-  height: 8px;
+  width: 10px;
+  height: 10px;
   background: var(--border);
   transform: rotate(45deg);
+}
+
+/* 十字装饰 */
+.cross-decoration {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.cross-decoration::before,
+.cross-decoration::after {
+  content: '✝';
+  font-size: 14px;
+  color: var(--border);
+  opacity: 0.6;
+}
+
+/* 哥特式尖顶拱形 */
+.gothic-arch-top {
+  position: relative;
+}
+
+.gothic-arch-top::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 30px;
+  border: 2px solid var(--border);
+  border-bottom: none;
+  border-radius: 60px 60px 0 0;
+  opacity: 0.3;
+}
+
+/* 教堂窗花图案 - 四叶玫瑰 */
+.church-window {
+  position: relative;
+}
+
+.church-window::before {
+  content: '❋';
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  font-size: 24px;
+  color: var(--border);
+  opacity: 0.15;
+  transform: rotate(45deg);
+}
+
+.church-window::after {
+  content: '';
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  width: 16px;
+  height: 16px;
+  border: 1px solid var(--border);
+  transform: rotate(45deg);
+  opacity: 0.1;
+}
+
+/* 复杂窗花 - 用于文章页面 */
+.gothic-rose {
+  position: relative;
+}
+
+.gothic-rose::before {
+  content: '✧';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 20px;
+  color: var(--border);
+  opacity: 0.2;
+}
+
+.gothic-rose::after {
+  content: '';
+  position: absolute;
+  top: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 30px;
+  height: 30px;
+  border: 1px solid var(--border);
+  transform: translateX(-50%) rotate(45deg);
+  opacity: 0.1;
 }
 
 /* 卡片阴影 - 哥特式深色 */
 .gothic-card {
   background: var(--bg-card);
   box-shadow: 
-    0 2px 8px rgba(0, 0, 0, 0.08),
-    0 8px 24px rgba(0, 0, 0, 0.04);
-  border: 1px solid rgba(0, 0, 0, 0.08);
+    0 2px 8px rgba(0, 0, 0, 0.06),
+    0 8px 24px rgba(0, 0, 0, 0.04),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(0, 0, 0, 0.06);
   transition: all 0.3s ease;
 }
 
 .gothic-card:hover {
   box-shadow: 
-    0 4px 12px rgba(0, 0, 0, 0.12),
-    0 12px 32px rgba(0, 0, 0, 0.08);
+    0 4px 16px rgba(0, 0, 0, 0.1),
+    0 16px 40px rgba(0, 0, 0, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
   transform: translateY(-2px);
 }
 
-/* 哥特式窗花装饰 - 四叶图案 */
-.gothic-window {
-  position: relative;
-  overflow: hidden;
+/* 文章内容区域 - 纯白反光背景 + 黑色字体 */
+.article-content {
+  background: linear-gradient(135deg, #ffffff 0%, #fafafa 50%, #ffffff 100%);
+  box-shadow: 
+    0 1px 3px rgba(0, 0, 0, 0.04),
+    0 4px 12px rgba(0, 0, 0, 0.03),
+    inset 0 0 80px rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(0, 0, 0, 0.04);
+  color: #1a1a1a;
 }
 
-.gothic-window::after {
-  content: '✦';
+/* 增加反光效果 */
+.article-content::before {
+  content: '';
   position: absolute;
-  top: 12px;
-  right: 12px;
-  font-size: 12px;
-  color: var(--border);
-  opacity: 0.4;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 60px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.4) 0%, transparent 100%);
+  pointer-events: none;
 }
 
-/* 文章内容 - 阅读界面 */
 .prose {
   font-size: 18px;
 }
@@ -133,13 +216,14 @@ a:hover {
   margin-bottom: 1.8em;
   text-align: justify;
   hyphens: auto;
+  color: #1a1a1a;
 }
 
 .prose h2 {
   font-size: 1.6em;
   margin-top: 2.5em;
   margin-bottom: 1em;
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid #e0e0e0;
   padding-bottom: 0.3em;
 }
 
@@ -149,14 +233,12 @@ a:hover {
   margin-bottom: 0.8em;
 }
 
-/* 哥特式引号装饰 */
 .prose blockquote {
   border-left: 3px solid var(--accent);
   padding: 0.5em 0 0.5em 1.5em;
   margin: 2em 0;
   font-style: italic;
-  color: var(--text-light);
-  position: relative;
+  color: #555;
 }
 
 .prose blockquote::before {
@@ -166,6 +248,27 @@ a:hover {
   top: -10px;
   font-size: 3em;
   color: var(--border);
-  opacity: 0.2;
+  opacity: 0.15;
   font-family: Georgia, serif;
+}
+
+/* 侧边装饰线 */
+.side-decoration-left {
+  position: relative;
+}
+
+.side-decoration-left::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: linear-gradient(180deg, 
+    transparent 0%, 
+    var(--border) 15%, 
+    var(--border) 85%, 
+    transparent 100%
+  );
+  opacity: 0.2;
 }
