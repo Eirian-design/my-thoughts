@@ -18,11 +18,11 @@ export default function Home() {
         </h1>
       </header>
 
-      {/* 文章列表 */}
-      <section className="space-y-4">
+      {/* 文章列表 - 白色光泽卡片 */}
+      <section className="space-y-6">
         {sortedPosts.map((post) => (
-          <article key={post.id} className="post-card p-6 rounded-lg">
-            <div className="flex items-center gap-3 mb-2 text-sm" style={{ color: '#888' }}>
+          <article key={post.id} className="article-card p-6 rounded-lg">
+            <div className="flex items-center gap-3 mb-3 text-sm" style={{ color: '#666' }}>
               <time>{post.date}</time>
               {post.tags.length > 0 && (
                 <>
@@ -32,10 +32,10 @@ export default function Home() {
               )}
             </div>
             <Link href={`/post/${post.id}`} className="block group">
-              <h2 className="text-xl font-serif font-normal mb-2 group-hover:opacity-70 transition-opacity post-title" style={{ color: '#e5e5e5' }}>
+              <h2 className="text-xl font-serif font-normal mb-2 group-hover:opacity-70 transition-opacity" style={{ color: '#1a1a1a' }}>
                 {post.title}
               </h2>
-              <p className="text-base leading-relaxed" style={{ color: '#888' }}>
+              <p className="text-base leading-relaxed" style={{ color: '#555' }}>
                 {post.excerpt}
               </p>
             </Link>
