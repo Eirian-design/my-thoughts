@@ -8,7 +8,7 @@ export const metadata: Metadata = {
 
 // 引入字体
 const fontStyles = `
-  @import url('https://fonts.googleapis.com/css2?family=ZCOOL+KuaiLe&family=Noto+Serif+SC:wght@400;600;700&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700&family=Playfair+Display:wght@400;600;700&display=swap');
 `;
 
 export default function RootLayout({
