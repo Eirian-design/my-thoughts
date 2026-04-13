@@ -118,7 +118,7 @@ export default async function PostPage({ params }: { params: Promise<{ id: strin
       </header>
 
       {/* 文章内容 - 白色光泽卡片 */}
-      <div className="article-card p-8 md:p-10 rounded-lg card-ornament-bottom">
+      <div className="article-card p-8 md:p-10 card-ornament-bottom">
         <div className="content rich-content">
           {renderContent(post.content)}
         </div>

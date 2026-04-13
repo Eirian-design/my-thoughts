@@ -6,6 +6,11 @@ export const metadata: Metadata = {
   description: "记录思考、灵感与学习",
 };
 
+// 引入字体
+const fontStyles = `
+  @import url('https://fonts.googleapis.com/css2?family=ZCOOL+KuaiLe&family=Noto+Serif+SC:wght@400;600;700&display=swap');
+`;
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -13,6 +18,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="zh-CN">
+      <head>
+        <style dangerouslySetInnerHTML={{ __html: fontStyles }} />
+      </head>
       <body>
         <div className="min-h-screen flex flex-col" style={{ background: 'var(--bg)' }}>
           
