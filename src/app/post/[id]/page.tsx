@@ -141,7 +141,7 @@ export default async function PostPage({ params }: { params: Promise<{ id: strin
             document.addEventListener('DOMContentLoaded', function() {
               Waline.init({
                 el: '#waline-container',
-                serverURL: 'https://waline.vercel.app',
+                serverURL: 'https://disscusion-ipr7wt9zu-eirian-designs-projects.vercel.app',
                 lang: 'zh-CN',
                 dark: 'body',
               });
