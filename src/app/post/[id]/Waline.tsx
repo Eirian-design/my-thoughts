@@ -39,7 +39,7 @@ export default function WalineComments() {
         if ((window as any).Waline && containerRef.current) {
           (window as any).Waline.init({
             el: containerRef.current,
-            serverURL: "https://waline.vercel.app",
+            serverURL: "https://disscusion-ipr7wt9zu-eirian-designs-projects.vercel.app",
             lang: "zh-CN",
           });
         }
