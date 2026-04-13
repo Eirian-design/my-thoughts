@@ -6,8 +6,8 @@ export default function WalineComments() {
   return (
     <>
       <div id="waline-container" className="mt-10 pt-6" style={{ borderTop: '1px solid #333' }}></div>
-      <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@waline/client@v3/dist/waline.css" />
-      <Script src="https://cdn.jsdelivr.net/npm/@waline/client@v3/dist/waline.js" strategy="afterInteractive" />
+      <link rel="stylesheet" href="/waline.css" />
+      <Script src="/waline.js" strategy="afterInteractive" />
       <Script
         strategy="afterInteractive"
         dangerouslySetInnerHTML={{
@@ -22,7 +22,7 @@ export default function WalineComments() {
                     dark: 'body',
                   });
                 }
-              }, 1500);
+              }, 2000);
             });
           `,
         }}
