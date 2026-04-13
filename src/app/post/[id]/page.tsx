@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 import { posts } from "../../../data/posts";
 import WalineComments from "./Waline";
@@ -76,9 +78,102 @@ function renderContent(content: string) {
   return elements;
 }
 
+// 分享组件
+function ShareButtons({ title, url }: { title: string; url: string }) {
+  const share = async () => {
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: title,
+          text: `分享一篇文章: ${title}`,
+          url: url,
+        });
+      } catch (err) {
+        console.log('分享取消');
+      }
+    } else {
+      // 不支持则复制链接
+      navigator.clipboard.writeText(url);
+      alert('链接已复制到剪贴板');
+    }
+  };
+
+  const shareToWechat = () => {
+    const wechatUrl = `https://api.addthis.com/pubapi/1.0/?redirect=%2F%2Fwww.addthis.com%2Ftoolbar%2F%3Fpu%3D${encodeURIComponent(url)}`;
+    window.open(wechatUrl, '_blank');
+  };
+
+  const shareToWeibo = () => {
+    const wbUrl = `https://service.weibo.com/share/share.php?url=${encodeURIComponent(url)}&title=${encodeURIComponent(title)}`;
+    window.open(wbUrl, '_blank');
+  };
+
+  const shareToTwitter = () => {
+    const twUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(title)}&url=${encodeURIComponent(url)}`;
+    window.open(twUrl, '_blank');
+  };
+
+  return (
+    <div className="mt-10 pt-6" style={{ borderTop: '1px solid #333' }}>
+      <div className="flex items-center justify-center gap-4">
+        <span style={{ color: '#666' }}>分享:</span>
+        
+        <button
+          onClick={share}
+          style={{
+            padding: '6px 12px',
+            background: '#07c160',
+            color: '#fff',
+            border: 'none',
+            borderRadius: '4px',
+            cursor: 'pointer',
+            fontSize: '14px',
+          }}
+          title="系统分享"
+        >
+          微信/分享
+        </button>
+        
+        <button
+          onClick={shareToWeibo}
+          style={{
+            padding: '6px 12px',
+            background: '#e6162d',
+            color: '#fff',
+            border: 'none',
+            borderRadius: '4px',
+            cursor: 'pointer',
+            fontSize: '14px',
+          }}
+          title="分享到微博"
+        >
+          微博
+        </button>
+        
+        <button
+          onClick={shareToTwitter}
+          style={{
+            padding: '6px 12px',
+            background: '#1da1f2',
+            color: '#fff',
+            border: 'none',
+            borderRadius: '4px',
+            cursor: 'pointer',
+            fontSize: '14px',
+          }}
+          title="分享到 Twitter"
+        >
+          X/Twitter
+        </button>
+      </div>
+    </div>
+  );
+}
+
 export default async function PostPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const post = posts.find((p) => p.id === id);
+  const pageUrl = `https://www.eirian.top/post/${id}`;
 
   if (!post) {
     return (
@@ -127,6 +222,9 @@ export default async function PostPage({ params }: { params: Promise<{ id: strin
         {/* 底部装饰 */}
         <div className="cross-divider mt-10 pt-6"></div>
       </div>
+
+      {/* 分享按钮 */}
+      <ShareButtons title={post.title} url={pageUrl} />
 
       {/* 评论区 */}
       <WalineComments />
