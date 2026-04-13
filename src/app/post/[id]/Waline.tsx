@@ -15,7 +15,7 @@ export default function Comments() {
           __html: `
             var commentbox_settings = {
               // 这里填你的 project ID，注册后获取
-              projectID: "your-project-id-here",
+              projectID: "5671822670430208-proj",
               theme: "dark",
               backgroundColor: "transparent",
               textColor: "#e5e5e5",
