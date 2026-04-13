@@ -9,16 +9,20 @@ export default function Comments() {
         <div id="comments"></div>
       </div>
       <Script
-        src="https://utteranc.es/client.js"
+        id="utterances"
         strategy="afterInteractive"
-        onLoad={() => {
-          // @ts-ignore
-          window.utterances = {
-            repo: "Eirian-design/my-thoughts",
-            issueTerm: "pathname",
-            label: "comment",
-            theme: "github-dark",
-          };
+        dangerouslySetInnerHTML={{
+          __html: `
+            var s = document.createElement('script');
+            s.src = 'https://utteranc.es/client.js';
+            s.setAttribute('repo', 'Eirian-design/my-thoughts');
+            s.setAttribute('issue-term', 'pathname');
+            s.setAttribute('label', 'comment');
+            s.setAttribute('theme', 'github-dark');
+            s.setAttribute('crossorigin', 'anonymous');
+            s.async = true;
+            document.getElementById('comments').appendChild(s);
+          `,
         }}
       />
     </>
