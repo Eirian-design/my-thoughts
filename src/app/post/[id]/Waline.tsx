@@ -5,23 +5,31 @@ import Script from "next/script";
 export default function Comments() {
   return (
     <>
-      <div className="mt-10 pt-6" style={{ borderTop: '1px solid #333' }}></div>
+      <div className="mt-10 pt-6" style={{ borderTop: '1px solid #333' }}>
+        <div id="commentbox" className="comment-box"></div>
+      </div>
       <Script
-        src="https://giscus.app/client.js"
+        id="commentbox-script"
         strategy="afterInteractive"
-        data-repo="Eirian-design/my-thoughts"
-        data-repo-id="R_kgDOR-3s6g"
-        data-category="Announcements"
-        data-category-id="DIC_kwDOR-3s6s4C6mNC"
-        data-mapping="pathname"
-        data-strict="0"
-        data-reactions-enabled="1"
-        data-emit-metadata="0"
-        data-input-position="bottom"
-        data-theme="dark"
-        data-lang="zh-CN"
-        data-loading="lazy"
-        crossOrigin="anonymous"
+        dangerouslySetInnerHTML={{
+          __html: `
+            var commentbox_settings = {
+              // 这里填你的 project ID，注册后获取
+              projectID: "your-project-id-here",
+              theme: "dark",
+              backgroundColor: "transparent",
+              textColor: "#e5e5e5",
+            };
+            (function(d, s, id) {
+              var js, fjs = d.getElementsByTagName(s)[0];
+              if (d.getElementById(id)) return;
+              js = d.createElement(s);
+              js.id = id;
+              js.src = "https://commentbox.io/js/commentbox.js";
+              fjs.parentNode.insertBefore(js, fjs);
+            })(document, "script", "commentbox-script");
+          `,
+        }}
       />
     </>
   );
