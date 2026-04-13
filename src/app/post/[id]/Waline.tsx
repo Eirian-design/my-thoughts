@@ -25,7 +25,7 @@ export default function Comments() {
               if (d.getElementById(id)) return;
               js = d.createElement(s);
               js.id = id;
-              js.src = "https://commentbox.io/js/commentbox.js";
+              js.src = "https://cdn.jsdelivr.net/npm/commentbox.io/dist/commentBox.min.js";
               fjs.parentNode.insertBefore(js, fjs);
             })(document, "script", "commentbox-script");
           `,
