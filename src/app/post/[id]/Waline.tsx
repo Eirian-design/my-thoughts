@@ -45,7 +45,7 @@ export default function WalineComments() {
           setLoading(false);
           (window as any).Waline.init({
             el: containerRef.current,
-            serverURL: "https://disscusion-ipr7wt9zu-eirian-designs-projects.vercel.app",
+            serverURL: "https://waline-demo.vercel.app",
             lang: "zh-CN",
           });
         }
