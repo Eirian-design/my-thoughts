@@ -5,30 +5,24 @@ import Script from "next/script";
 export default function Comments() {
   return (
     <>
-      <div className="mt-10 pt-6" style={{ borderTop: "1px solid #333" }}>
-        <div id="disqus_thread"></div>
-      </div>
+      <div className="mt-10 pt-6" style={{ borderTop: '1px solid #333' }}></div>
       <Script
-        id="disqus-config"
+        src="https://giscus.app/client.js"
         strategy="afterInteractive"
-        dangerouslySetInnerHTML={{
-          __html: `
-            var disqus_config = function() {
-              this.page.url = window.location.href;
-              this.page.identifier = window.location.pathname;
-            };
-            (function() {
-              var d = document, s = d.createElement('script');
-              s.src = 'https://eirian-top.disqus.com/embed.js';
-              s.setAttribute('data-timestamp', +new Date());
-              (d.head || d.body).appendChild(s);
-            })();
-          `,
-        }}
+        data-repo="Eirian-design/my-thoughts"
+        data-repo-id="R_kgDOR-3s6g"
+        data-category="Announcements"
+        data-category-id="DIC_kwDOR-3s6s4C6mNC"
+        data-mapping="pathname"
+        data-strict="0"
+        data-reactions-enabled="1"
+        data-emit-metadata="0"
+        data-input-position="bottom"
+        data-theme="dark"
+        data-lang="zh-CN"
+        data-loading="lazy"
+        crossOrigin="anonymous"
       />
-      <noscript>
-        请启用 JavaScript 以查看评论系统
-      </noscript>
     </>
   );
 }
