@@ -1,5 +1,8 @@
+"use client";
+
 import Link from "next/link";
 import { posts } from "../../../data/posts";
+import { useEffect } from "react";
 
 export function generateStaticParams() {
   return posts.map((post) => ({ id: post.id }));
@@ -127,25 +130,21 @@ export default async function PostPage({ params }: { params: Promise<{ id: strin
         <div className="cross-divider mt-10 pt-6"></div>
       </div>
 
-      {/* 评论区 - Giscus */}
-      <div className="mt-10 pt-6" style={{ borderTop: '1px solid #333' }}>
-        <script
-          src="https://giscus.app/client.js"
-          data-repo="Eirian-design/my-thoughts"
-          data-repo-id="R_kgDOR-3s6g"
-          data-category="Announcements"
-          data-category-id="DIC_kwDOR-3s6s4C6mNC"
-          data-mapping="pathname"
-          data-strict="0"
-          data-reactions-enabled="1"
-          data-emit-metadata="0"
-          data-input-position="bottom"
-          data-theme="dark"
-          data-lang="zh-CN"
-          crossOrigin="anonymous"
-          async
-        />
-      </div>
+      {/* 评论区 - Waline */}
+      <div id="waline-container" className="mt-10 pt-6" style={{ borderTop: '1px solid #333' }}></div>
+      <script src="//unpkg.com/@waline/client@v3/dist/waline.js"></script>
+      <script
+        dangerouslySetInnerHTML={{
+          __html: `
+            Waline.init({
+              el: '#waline-container',
+              serverURL: 'https://waline.vercel.app',
+              lang: 'zh-CN',
+              dark: 'body',
+            });
+          `,
+        }}
+      />
 
       {/* 底部导航 */}
       <nav className="mt-10 text-center">
