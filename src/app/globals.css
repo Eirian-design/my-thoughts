@@ -168,7 +168,7 @@ a:hover {
 .rich-content {
   font-size: 17px;
   line-height: 1.85;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+  font-family: 'Lora', 'Noto Serif SC', Georgia, 'Times New Roman', serif;
 }
 
 .rich-content p {
