@@ -1,7 +1,9 @@
 "use client";
 
+import { useEffect } from "react";
+
 export default function Comments() {
-  if (typeof window !== 'undefined') {
+  useEffect(() => {
     const script = document.createElement('script');
     script.src = 'https://utteranc.es/client.js';
     script.setAttribute('repo', 'Eirian-design/my-thoughts');
@@ -10,8 +12,12 @@ export default function Comments() {
     script.setAttribute('theme', 'github-dark');
     script.setAttribute('crossorigin', 'anonymous');
     script.async = true;
-    document.getElementById('comments')?.appendChild(script);
-  }
+    
+    const container = document.getElementById('comments');
+    if (container) {
+      container.appendChild(script);
+    }
+  }, []);
 
   return (
     <div className="mt-10 pt-6" style={{ borderTop: '1px solid #333' }}>
