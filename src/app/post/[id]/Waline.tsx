@@ -1,29 +1,20 @@
 "use client";
 
-import { useEffect, useRef } from "react";
-
 export default function Comments() {
-  const containerRef = useRef<HTMLDivElement>(null);
-  
-  useEffect(() => {
-    const script = document.createElement('script');
-    script.src = 'https://cdn.jsdelivr.net/npm/commentbox.io/dist/commentBox.min.js';
-    script.async = true;
-    
-    script.onload = () => {
-      // @ts-ignore
-      if (window.commentBox) {
-        // @ts-ignore
-        window.commentBox('5671822670430208-proj');
-      }
-    };
-    
-    document.body.appendChild(script);
-  }, []);
-
   return (
     <div className="mt-10 pt-6" style={{ borderTop: '1px solid #333' }}>
-      <div ref={containerRef} className="commentbox"></div>
+      <h3 style={{ color: '#e5e5e5', marginBottom: '20px' }}>评论</h3>
+      <iframe 
+        src="https://docs.google.com/forms/d/e/1FAIpQLSdXa5NhIbLqKkG7H1qYxN-GY8qQ9jP3qN-YqKxG7H1qYxN-GY8/viewform?embedded=true" 
+        width="100%" 
+        height="500" 
+        frameBorder="0" 
+        marginHeight={0} 
+        marginWidth={0}
+        style={{ background: '#1a1a1a', borderRadius: '8px' }}
+      >
+        加载中…
+      </iframe>
     </div>
   );
 }
