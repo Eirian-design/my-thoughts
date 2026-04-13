@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { posts } from "../../../data/posts";
-import { useEffect } from "react";
+import Script from "next/script";
 
 export function generateStaticParams() {
   return posts.map((post) => ({ id: post.id }));
@@ -132,15 +132,19 @@ export default async function PostPage({ params }: { params: Promise<{ id: strin
 
       {/* 评论区 - Waline */}
       <div id="waline-container" className="mt-10 pt-6" style={{ borderTop: '1px solid #333' }}></div>
-      <script src="//unpkg.com/@waline/client@v3/dist/waline.js"></script>
-      <script
+      <link rel="stylesheet" href="https://unpkg.com/@waline/client@v3/dist/waline.css" />
+      <Script src="https://unpkg.com/@waline/client@v3/dist/waline.js" strategy="afterInteractive" />
+      <Script
+        strategy="afterInteractive"
         dangerouslySetInnerHTML={{
           __html: `
-            Waline.init({
-              el: '#waline-container',
-              serverURL: 'https://waline.vercel.app',
-              lang: 'zh-CN',
-              dark: 'body',
+            document.addEventListener('DOMContentLoaded', function() {
+              Waline.init({
+                el: '#waline-container',
+                serverURL: 'https://waline.vercel.app',
+                lang: 'zh-CN',
+                dark: 'body',
+              });
             });
           `,
         }}
