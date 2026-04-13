@@ -17,7 +17,7 @@ export default function WalineComments() {
                 if (typeof Waline !== 'undefined') {
                   Waline.init({
                     el: '#waline-container',
-                    serverURL: 'https://disscusion-ipr7wt9zu-eirian-designs-projects.vercel.app',
+                    serverURL: 'https://waline.vercel.app',
                     lang: 'zh-CN',
                     dark: 'body',
                   });
