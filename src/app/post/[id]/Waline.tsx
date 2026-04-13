@@ -1,30 +1,29 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 
 export default function Comments() {
+  const containerRef = useRef<HTMLDivElement>(null);
+  
   useEffect(() => {
     const script = document.createElement('script');
-    script.src = 'https://giscus.app/client.js';
-    script.setAttribute('data-repo', 'Eirian-design/my-thoughts');
-    script.setAttribute('data-repo-id', 'R_kgDOExample');
-    script.setAttribute('data-category', 'General');
-    script.setAttribute('data-category-id', 'DIC_kwDOExample');
-    script.setAttribute('data-mapping', 'pathname');
-    script.setAttribute('data-strict', '0');
-    script.setAttribute('data-reactions-enabled', '1');
-    script.setAttribute('data-emit-metadata', '0');
-    script.setAttribute('data-input-position', 'bottom');
-    script.setAttribute('data-theme', 'dark');
-    script.setAttribute('data-lang', 'zh-CN');
-    script.setAttribute('crossorigin', 'anonymous');
+    script.src = 'https://cdn.jsdelivr.net/npm/commentbox.io/dist/commentBox.min.js';
     script.async = true;
+    
+    script.onload = () => {
+      // @ts-ignore
+      if (window.commentBox) {
+        // @ts-ignore
+        window.commentBox('5671822670430208-proj');
+      }
+    };
+    
     document.body.appendChild(script);
   }, []);
 
   return (
     <div className="mt-10 pt-6" style={{ borderTop: '1px solid #333' }}>
-      <div id="giscus-container"></div>
+      <div ref={containerRef} className="commentbox"></div>
     </div>
   );
 }
