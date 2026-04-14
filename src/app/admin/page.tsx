@@ -24,6 +24,7 @@ export default function AdminPage() {
   const [excerpt, setExcerpt] = useState("");
   const [blocks, setBlocks] = useState<ContentBlock[]>([{ type: "paragraph", content: "" }]);
   const [tags, setTags] = useState("");
+  const [author, setAuthor] = useState("");
   const [date, setDate] = useState(new Date().toISOString().split("T")[0]);
   const [isPublishing, setIsPublishing] = useState(false);
   const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
@@ -336,6 +337,7 @@ export default function AdminPage() {
     excerpt: \`${excerptText}\`,
     date: "${date}",
     tags: ${JSON.stringify(tagsArray)},
+    author: "${author || 'Eirian'}",
     content: \`${content.replace(/`/g, "\\`")}\`,
   },`;
 
@@ -517,6 +519,18 @@ export default function AdminPage() {
             value={tags}
             onChange={(e) => setTags(e.target.value)}
             placeholder="如：随笔, 思考, 写作"
+            className="w-full px-4 py-3 rounded-lg border"
+            style={{ borderColor: 'var(--border)', background: 'var(--bg-card)', color: '#e5e5e5' }}
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm mb-2" style={{ color: '#888888' }}>作者（可选）</label>
+          <input
+            type="text"
+            value={author}
+            onChange={(e) => setAuthor(e.target.value)}
+            placeholder="默认为 Eirian"
             className="w-full px-4 py-3 rounded-lg border"
             style={{ borderColor: 'var(--border)', background: 'var(--bg-card)', color: '#e5e5e5' }}
           />

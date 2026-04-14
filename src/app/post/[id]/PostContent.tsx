@@ -9,6 +9,7 @@ type Post = {
   date: string;
   tags: string[];
   content: string;
+  author?: string;
 };
 
 function renderContent(content: string) {
@@ -96,6 +97,8 @@ export default function PostContent({ post, pageUrl }: { post: Post; pageUrl: st
       <header className="mb-8">
         <div className="flex items-center gap-3 mb-4 text-sm" style={{ color: '#888' }}>
           <time>{post.date}</time>
+          <span>·</span>
+          <span>作者: {post.author || 'Eirian'}</span>
           {post.tags.length > 0 && <><span>·</span><span>{post.tags.join(", ")}</span></>}
         </div>
         <h1 className="text-3xl md:text-4xl font-serif" style={{ color: '#e5e5e5' }}>{post.title}</h1>
