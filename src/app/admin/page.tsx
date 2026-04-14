@@ -69,15 +69,25 @@ export default function AdminPage() {
       });
       const data = await res.json();
       let content = decodeURIComponent(escape(atob(data.content)));
-      const postPattern = new RegExp(`\\{\\s*id:[^}]*id:[^}]*\\\\"${postId}\\\"[^}]+\\},?`, 's');
-      content = content.replace(postPattern, '').replace(/\n\n\n+/g, '\n\n');
+      // 找到 id: "postId" 所在的整个文章块
+      const startIdx = content.indexOf(`id: "${postId}"`);
+      if (startIdx === -1) { alert("找不到文章"); return; }
+      // 向前找到开头的 {
+      let start = content.lastIndexOf('\n  {', startIdx);
+      if (start === -1) start = content.indexOf('{', startIdx - 20);
+      // 向后找到结尾的 },
+      let end = content.indexOf('\n  },', startIdx);
+      if (end === -1) end = content.indexOf('},', startIdx);
+      if (end !== -1) end += 3;
+      // 删除文章块
+      content = content.slice(0, start).trim() + content.slice(end).trim();
       const body = { message: `删除文章: ${postId}`, content: btoa(unescape(encodeURIComponent(content))), sha: data.sha };
       const putRes = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/contents/${POSTS_FILE}`, {
         method: "PUT", headers: { Authorization: `token ${githubToken}`, "Content-Type": "application/json" },
         body: JSON.stringify(body),
       });
-      if (putRes.ok) { alert("删除成功！"); fetchPosts(); } else { alert("删除失败"); }
-    } catch { alert("删除失败"); }
+      if (putRes.ok) { alert("删除成功！"); fetchPosts(); } else { alert("删除失败: " + putRes.status); }
+    } catch (e) { alert("删除失败: " + e); }
   };
 
   const handleLogin = (e: React.FormEvent) => {
