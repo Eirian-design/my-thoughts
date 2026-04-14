@@ -74,7 +74,7 @@ export default function Quiz({
         <p className="text-2xl mb-4" style={{ color: '#4ade80' }}>🎉 恭喜完成！</p>
         <button
           onClick={() => { setCurrentIndex(0); setInput(""); setCompleted(false); setCorrect(false); setShowAnswer(false); }}
-          className="px-6 py-2 rounded-lg mr-3"
+          className="px-6 py-2 rounded-lg"
           style={{ background: 'var(--accent)', color: '#fff' }}
         >
           再来一次
@@ -87,17 +87,15 @@ export default function Quiz({
   const prevAnswer = currentIndex > 0 ? blanks[currentIndex - 1].answer : "";
   const hint = blanks[currentIndex]?.hint || "";
 
-  // 挖空模式：从整句中挖掉部分内容
+  // 挖空模式：显示完整句子，挖空关键部分（用_____表示）
   if (mode2 === "blank") {
-    // 把答案分成几个字，保留首尾，中间隐藏
+    // 把答案中部分内容挖空，用 ____ 代替
     const chars = currentAnswer.split('');
-    const hideCount = Math.max(1, Math.floor(chars.length * 0.5));
-    const startKeep = Math.ceil(chars.length * 0.25);
-    const blanked = [...chars];
-    for (let i = startKeep; i < startKeep + hideCount && i < chars.length - 1; i++) {
-      blanked[i] = '·';
-    }
-    const displayText = blanked.join('');
+    const hideCount = Math.max(2, Math.floor(chars.length * 0.6));
+    const startHide = Math.floor((chars.length - hideCount) / 2);
+    const displayText = chars.map((c, i) => 
+      i >= startHide && i < startHide + hideCount ? '_' : c
+    ).join('').replace(/_+/g, '___');
     
     return (
       <div>
@@ -124,15 +122,20 @@ export default function Quiz({
           第 {currentIndex + 1} 题 / 共 {blanks.length} 题
         </div>
 
-        {/* 题目 */}
+        {/* 题目：完整句子，关键部分挖空 */}
         <div className="mb-6 p-4 rounded-lg text-center" style={{ 
           background: '#f5f5f5', 
           color: '#1a1a1a',
-          fontSize: '24px',
+          fontSize: '22px',
           fontFamily: 'serif',
           letterSpacing: '2px'
         }}>
           {displayText}
+        </div>
+
+        {/* 提示 */}
+        <div className="mb-4 text-sm" style={{ color: '#888' }}>
+          提示：{hint}
         </div>
 
         {/* 输入框 */}
@@ -143,7 +146,7 @@ export default function Quiz({
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && checkAnswer()}
-              placeholder={`填写答案${hint ? `（${hint}）` : ''}`}
+              placeholder={`填写挖空的内容`}
               className="w-full px-4 py-3 rounded-lg border text-lg"
               style={{ 
                 borderColor: correct ? '#4ade80' : showHint ? '#f87171' : '#ddd', 
@@ -168,9 +171,6 @@ export default function Quiz({
               >
                 不会
               </button>
-              {showHint && (
-                <span style={{ color: '#f87171' }}>提示: {hint}</span>
-              )}
             </div>
           </div>
         )}
@@ -222,7 +222,7 @@ export default function Quiz({
       <div className="mb-6 p-4 rounded-lg text-center" style={{ 
         background: '#f5f5f5', 
         color: '#1a1a1a',
-        fontSize: '24px',
+        fontSize: '22px',
         fontFamily: 'serif',
         letterSpacing: '2px'
       }}>
