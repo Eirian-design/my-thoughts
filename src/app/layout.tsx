@@ -33,7 +33,9 @@ export default function RootLayout({
                 </a>
                 <nav className="flex gap-6 text-sm" style={{ color: '#888' }}>
                   <a href="/" className="hover:opacity-70 transition-opacity">首页</a>
-                  <a href="/admin" className="hover:opacity-70 transition-opacity">写文章</a>
+                  <a href="/admin" className="hover:opacity-70 transition-opacity">Writer</a>
+                  <a href="/tcm" className="hover:opacity-70 transition-opacity">TCM</a>
+                  <a href="/words" className="hover:opacity-70 transition-opacity">Words</a>
                 </nav>
               </div>
             </div>
