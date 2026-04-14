@@ -21,7 +21,7 @@ export default function Quiz({
   const [completed, setCompleted] = useState(false);
   const [correct, setCorrect] = useState(false);
   const [showAnswer, setShowAnswer] = useState(false);
-  const [mode2, setMode2] = useState<"blank" | "recall">(mode);
+  const [mode2, setMode2] = useState<QuizMode>(mode);
 
   const switchMode = (newMode: "blank" | "recall") => {
     setMode2(newMode);
