@@ -94,8 +94,9 @@ export default function Quiz({
 
         {/* 当前句子 */}
         <div className="leading-relaxed text-xl mb-6 p-4 rounded-lg" style={{ 
-          background: 'var(--bg-card)', 
-          color: '#ffffff', 
+          background: '#ffffff', 
+                 
+          color: '#1a1a1a', 
           fontFamily: 'serif',
           borderLeft: '3px solid var(--accent)'
         }}>
@@ -110,11 +111,11 @@ export default function Quiz({
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && checkAnswer()}
-              placeholder={`填写答案${hint ? `（${hint}）` : ''}`}
               className="w-full px-4 py-3 rounded-lg border text-lg"
               style={{ 
                 borderColor: correct ? '#4ade80' : showHint ? '#f87171' : 'var(--border)', 
-                background: 'var(--bg-card)', 
+                background: '#ffffff', 
+                 
                 color: '#fff'
               }}
               autoFocus
@@ -162,15 +163,17 @@ export default function Quiz({
 
       {/* 上一句（提示） */}
       {showPrevLine && currentBlank > 0 && (
-        <div className="mb-4 p-3 rounded-lg" style={{ background: 'var(--bg-card)', color: '#666' }}>
+        <div className="mb-4 p-3 rounded-lg" style={{ background: '#ffffff', 
+                 color: '#666' }}>
           上一句：{prevLine}
         </div>
       )}
 
       {/* 空格让用户填写 */}
       <div className="leading-relaxed text-xl mb-6 p-6 rounded-lg" style={{ 
-        background: 'var(--bg-card)', 
-        color: '#ffffff', 
+        background: '#ffffff', 
+                 
+        color: '#1a1a1a', 
         fontFamily: 'serif',
         borderLeft: '3px solid var(--accent)'
       }}>
@@ -189,8 +192,9 @@ export default function Quiz({
             className="w-full px-4 py-3 rounded-lg border text-lg"
             style={{ 
               borderColor: correct ? '#4ade80' : showHint ? '#f87171' : 'var(--border)', 
-              background: 'var(--bg-card)', 
-              color: '#ffffff'
+              background: '#ffffff', 
+                 
+              color: '#1a1a1a'
             }}
             autoFocus
           />
