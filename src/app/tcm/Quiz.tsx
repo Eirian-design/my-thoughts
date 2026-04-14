@@ -4,12 +4,28 @@ import { useState } from "react";
 
 type Blank = { answer: string; hint: string };
 
-export default function Quiz({ content, blanks }: { content: string; blanks: Blank[] }) {
+type QuizMode = "blank" | "recall"; // 挖空模式 or 背下一句模式
+
+export default function Quiz({ 
+  content, 
+  blanks, 
+  mode = "blank" as QuizMode,
+  showPrevLine = true // 是否显示上一句提示
+}: { 
+  content: string; 
+  blanks: Blank[];
+  mode?: QuizMode;
+  showPrevLine?: boolean;
+}) {
   const [currentBlank, setCurrentBlank] = useState(0);
   const [input, setInput] = useState("");
   const [showHint, setShowHint] = useState(false);
   const [completed, setCompleted] = useState(false);
   const [correct, setCorrect] = useState(false);
+  const [showAnswer, setShowAnswer] = useState(false);
+
+  // 把歌诀按句子分开
+  const lines = content.split(/[；；\n]/).filter(l => l.trim());
 
   const checkAnswer = () => {
     const expected = blanks[currentBlank].answer;
@@ -21,6 +37,7 @@ export default function Quiz({ content, blanks }: { content: string; blanks: Bla
           setInput("");
           setCorrect(false);
           setShowHint(false);
+          setShowAnswer(false);
         } else {
           setCompleted(true);
         }
@@ -31,12 +48,27 @@ export default function Quiz({ content, blanks }: { content: string; blanks: Bla
     }
   };
 
+  const handleShowAnswer = () => {
+    setShowAnswer(true);
+    setTimeout(() => {
+      if (currentBlank + 1 < blanks.length) {
+        setCurrentBlank(currentBlank + 1);
+        setInput("");
+        setCorrect(false);
+        setShowHint(false);
+        setShowAnswer(false);
+      } else {
+        setCompleted(true);
+      }
+    }, 1500);
+  };
+
   if (completed) {
     return (
       <div className="text-center py-8">
         <p className="text-2xl mb-4" style={{ color: '#4ade80' }}>🎉 恭喜完成！</p>
         <button
-          onClick={() => { setCurrentBlank(0); setInput(""); setCompleted(false); setCorrect(false); }}
+          onClick={() => { setCurrentBlank(0); setInput(""); setCompleted(false); setCorrect(false); setShowAnswer(false); }}
           className="px-6 py-2 rounded-lg"
           style={{ background: 'var(--accent)', color: '#fff' }}
         >
@@ -46,75 +78,148 @@ export default function Quiz({ content, blanks }: { content: string; blanks: Bla
     );
   }
 
-  // 处理歌诀显示
-  const renderContent = () => {
-    let parts: React.ReactNode[] = [];
-    let remainingContent = content;
+  const currentLine = blanks[currentBlank]?.answer || "";
+  const prevLine = currentBlank > 0 ? blanks[currentBlank - 1]?.answer : "";
 
-    blanks.forEach((blank, idx) => {
-      const blankText = blank.answer;
-      const idxPos = remainingContent.indexOf(blankText);
-      
-      if (idxPos !== -1 && idx === currentBlank) {
-        if (idxPos > 0) {
-          parts.push(<span key={`text-${idx}`} style={{ color: '#888' }}>{remainingContent.slice(0, idxPos)}</span>);
-        }
-        parts.push(
+  // 挖空模式：显示当前句，关键词留空
+  if (mode === "blank") {
+    const hint = blanks[currentBlank]?.hint || "";
+    
+    return (
+      <div>
+        {/* 显示进度 */}
+        <div className="mb-4 flex items-center gap-2" style={{ color: '#666' }}>
+          <span>{currentBlank + 1}</span> / <span>{blanks.length}</span>
+        </div>
+
+        {/* 当前句子 */}
+        <div className="leading-relaxed text-xl mb-6 p-4 rounded-lg" style={{ 
+          background: 'var(--bg-card)', 
+          color: '#e5e5e5', 
+          fontFamily: 'serif',
+          borderLeft: '3px solid var(--accent)'
+        }}>
+          {currentLine}
+        </div>
+
+        {/* 输入框 */}
+        {!showAnswer && (
+          <div className="space-y-4">
+            <input
+              type="text"
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && checkAnswer()}
+              placeholder={`填写答案${hint ? `（${hint}）` : ''}`}
+              className="w-full px-4 py-3 rounded-lg border text-lg"
+              style={{ 
+                borderColor: correct ? '#4ade80' : showHint ? '#f87171' : 'var(--border)', 
+                background: 'var(--bg-card)', 
+                color: '#e5e5e5'
+              }}
+              autoFocus
+            />
+            
+            <div className="flex items-center gap-3">
+              <button
+                onClick={checkAnswer}
+                className="px-6 py-2 rounded-lg"
+                style={{ background: 'var(--accent)', color: '#fff' }}
+              >
+                确认
+              </button>
+              <button
+                onClick={handleShowAnswer}
+                className="px-4 py-2 rounded-lg"
+                style={{ border: '1px solid var(--border)', color: '#888' }}
+              >
+                不会，点此显示
+              </button>
+              {showHint && (
+                <span style={{ color: '#f87171' }}>提示: {hint}</span>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* 显示答案后 */}
+        {showAnswer && (
+          <div className="p-4 rounded-lg" style={{ background: 'rgba(74, 222, 128, 0.1)', border: '1px solid #4ade80' }}>
+            <p style={{ color: '#4ade80' }}>答案: {currentLine}</p>
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  // 背下一句模式：显示上一句，用户说下一句
+  return (
+    <div>
+      {/* 显示进度 */}
+      <div className="mb-4 flex items-center gap-2" style={{ color: '#666' }}>
+        <span>{currentBlank + 1}</span> / <span>{blanks.length}</span>
+      </div>
+
+      {/* 上一句（提示） */}
+      {showPrevLine && currentBlank > 0 && (
+        <div className="mb-4 p-3 rounded-lg" style={{ background: 'var(--bg-card)', color: '#666' }}>
+          上一句：{prevLine}
+        </div>
+      )}
+
+      {/* 空格让用户填写 */}
+      <div className="leading-relaxed text-xl mb-6 p-6 rounded-lg" style={{ 
+        background: 'var(--bg-card)', 
+        color: '#e5e5e5', 
+        fontFamily: 'serif',
+        borderLeft: '3px solid var(--accent)'
+      }}>
+        {currentBlank === 0 ? "（请说出第一句）" : "请说下一句："}
+      </div>
+
+      {/* 输入框 */}
+      {!showAnswer && (
+        <div className="space-y-4">
           <input
-            key={`input-${idx}`}
             type="text"
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && checkAnswer()}
             placeholder="填写答案"
-            className="px-2 py-1 rounded border mx-1 text-center"
+            className="w-full px-4 py-3 rounded-lg border text-lg"
             style={{ 
               borderColor: correct ? '#4ade80' : showHint ? '#f87171' : 'var(--border)', 
               background: 'var(--bg-card)', 
-              color: '#e5e5e5',
-              width: `${Math.max(60, blankText.length * 20)}px`
+              color: '#e5e5e5'
             }}
             autoFocus
           />
-        );
-        remainingContent = remainingContent.slice(idxPos + blankText.length);
-      } else if (idxPos !== -1) {
-        if (idxPos > 0) {
-          parts.push(<span key={`text-done-${idx}`} style={{ color: '#888' }}>{remainingContent.slice(0, idxPos)}</span>);
-        }
-        parts.push(<span key={`done-${idx}`} style={{ color: '#4ade80' }}>{blankText}</span>);
-        remainingContent = remainingContent.slice(idxPos + blankText.length);
-      }
-    });
-    
-    if (remainingContent) {
-      parts.push(<span key="text-end" style={{ color: '#888' }}>{remainingContent}</span>);
-    }
-    
-    return parts;
-  };
+          
+          <div className="flex items-center gap-3">
+            <button
+              onClick={checkAnswer}
+              className="px-6 py-2 rounded-lg"
+              style={{ background: 'var(--accent)', color: '#fff' }}
+            >
+              确认
+            </button>
+            <button
+              onClick={handleShowAnswer}
+              className="px-4 py-2 rounded-lg"
+              style={{ border: '1px solid var(--border)', color: '#888' }}
+            >
+              不会，点此显示
+            </button>
+          </div>
+        </div>
+      )}
 
-  return (
-    <div>
-      <div className="leading-relaxed text-lg mb-6" style={{ color: '#e5e5e5', fontFamily: 'serif' }}>
-        {renderContent()}
-      </div>
-
-      <div className="flex items-center gap-4">
-        <button
-          onClick={checkAnswer}
-          className="px-6 py-2 rounded-lg"
-          style={{ background: 'var(--accent)', color: '#fff' }}
-        >
-          确认
-        </button>
-        <span style={{ color: '#666' }}>
-          {currentBlank + 1} / {blanks.length}
-        </span>
-        {showHint && (
-          <span style={{ color: '#f87171' }}>提示: {blanks[currentBlank].hint}</span>
-        )}
-      </div>
+      {/* 显示答案后 */}
+      {showAnswer && (
+        <div className="p-4 rounded-lg" style={{ background: 'rgba(74, 222, 128, 0.1)', border: '1px solid #4ade80' }}>
+          <p style={{ color: '#4ade80' }}>答案: {currentLine}</p>
+        </div>
+      )}
     </div>
   );
 }
