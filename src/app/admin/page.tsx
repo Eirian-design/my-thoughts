@@ -28,12 +28,57 @@ export default function AdminPage() {
   const [isPublishing, setIsPublishing] = useState(false);
   const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
   const [activeBlock, setActiveBlock] = useState<number | null>(null);
+  const [posts, setPosts] = useState<{id: string; title: string; date: string}[]>([]);
+  const [showPostList, setShowPostList] = useState(false);
 
   // 加载保存的 token
   useEffect(() => {
     const saved = localStorage.getItem("github-token");
     if (saved) setGithubToken(saved);
   }, []);
+
+  // 加载文章列表
+  const fetchPosts = async () => {
+    if (!githubToken) return;
+    try {
+      const res = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/contents/${POSTS_FILE}`, {
+        headers: { Authorization: `token ${githubToken}` },
+      });
+      const data = await res.json();
+      const content = decodeURIComponent(escape(atob(data.content)));
+      const postMatches = content.match(/\{\s*id:\s*"[^"]+"[^}]+\}/g);
+      if (postMatches) {
+        const parsed = postMatches.map(p => {
+          const idMatch = p.match(/id:\s*"([^"]+)"/);
+          const titleMatch = p.match(/title:\s*"([^"]+)"/);
+          const dateMatch = p.match(/date:\s*"([^"]+)"/);
+          return { id: idMatch?.[1] || "", title: titleMatch?.[1] || "", date: dateMatch?.[1] || "" };
+        }).filter(p => p.id && p.title);
+        setPosts(parsed);
+      }
+    } catch (e) { console.error("Failed to fetch posts", e); }
+  };
+
+  // 删除文章
+  const handleDeletePost = async (postId: string) => {
+    if (!confirm("确定要删除这篇文章吗？")) return;
+    if (!githubToken) { alert("请先填写 GitHub Token"); return; }
+    try {
+      const res = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/contents/${POSTS_FILE}`, {
+        headers: { Authorization: `token ${githubToken}` },
+      });
+      const data = await res.json();
+      let content = decodeURIComponent(escape(atob(data.content)));
+      const postPattern = new RegExp(`\\{\\s*id:[^}]*id:[^}]*\\\\"${postId}\\\"[^}]+\\},?`, 's');
+      content = content.replace(postPattern, '').replace(/\n\n\n+/g, '\n\n');
+      const body = { message: `删除文章: ${postId}`, content: btoa(unescape(encodeURIComponent(content))), sha: data.sha };
+      const putRes = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/contents/${POSTS_FILE}`, {
+        method: "PUT", headers: { Authorization: `token ${githubToken}`, "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+      if (putRes.ok) { alert("删除成功！"); fetchPosts(); } else { alert("删除失败"); }
+    } catch { alert("删除失败"); }
+  };
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
@@ -358,7 +403,16 @@ export default function AdminPage() {
 
       {/* GitHub Token 设置 */}
       <div className="card rounded-lg p-4 mb-6" style={{ borderLeft: '3px solid var(--accent)' }}>
-        <label className="block text-sm mb-2" style={{ color: '#e5e5e5' }}>🔑 GitHub Token（自动发布用）</label>
+        <div className="flex justify-between items-center mb-2">
+          <label className="block text-sm" style={{ color: '#e5e5e5' }}>🔑 GitHub Token（自动发布用）</label>
+          <button
+            onClick={() => { fetchPosts(); setShowPostList(!showPostList); }}
+            className="px-3 py-1 rounded text-sm"
+            style={{ background: showPostList ? '#4CAF50' : '#666', color: '#fff' }}
+          >
+            {showPostList ? '✅ 已展开' : '📋 文章列表'}
+          </button>
+        </div>
         <div className="flex gap-2">
           <input
             type="password"
@@ -380,6 +434,34 @@ export default function AdminPage() {
           Token 需要 repo 权限。保存后会保存在浏览器本地。
         </p>
       </div>
+
+      {/* 文章列表 - 可展开 */}
+      {showPostList && (
+        <div className="card rounded-lg p-4 mb-6">
+          <h3 className="text-lg font-medium mb-4" style={{ color: '#e5e5e5' }}>已有文章 ({posts.length})</h3>
+          {posts.length === 0 ? (
+            <p style={{ color: '#888888' }}>暂无文章</p>
+          ) : (
+            <div className="space-y-2 max-h-64 overflow-y-auto">
+              {posts.map(post => (
+                <div key={post.id} className="flex justify-between items-center p-2 rounded" style={{ background: 'var(--bg)' }}>
+                  <div>
+                    <span style={{ color: '#e5e5e5' }}>{post.title}</span>
+                    <span className="ml-2 text-sm" style={{ color: '#888888' }}>{post.date}</span>
+                  </div>
+                  <button
+                    onClick={() => handleDeletePost(post.id)}
+                    className="px-3 py-1 rounded text-sm"
+                    style={{ background: '#ff4444', color: '#fff' }}
+                  >
+                    删除
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
 
       <form onSubmit={handlePublish} className="space-y-6">
         <div className="grid grid-cols-2 gap-4">
