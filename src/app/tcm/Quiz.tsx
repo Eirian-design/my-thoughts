@@ -95,7 +95,7 @@ export default function Quiz({
         {/* 当前句子 */}
         <div className="leading-relaxed text-xl mb-6 p-4 rounded-lg" style={{ 
           background: 'var(--bg-card)', 
-          color: '#e5e5e5', 
+          color: '#ffffff', 
           fontFamily: 'serif',
           borderLeft: '3px solid var(--accent)'
         }}>
@@ -115,7 +115,7 @@ export default function Quiz({
               style={{ 
                 borderColor: correct ? '#4ade80' : showHint ? '#f87171' : 'var(--border)', 
                 background: 'var(--bg-card)', 
-                color: '#e5e5e5'
+                color: '#fff'
               }}
               autoFocus
             />
@@ -170,7 +170,7 @@ export default function Quiz({
       {/* 空格让用户填写 */}
       <div className="leading-relaxed text-xl mb-6 p-6 rounded-lg" style={{ 
         background: 'var(--bg-card)', 
-        color: '#e5e5e5', 
+        color: '#ffffff', 
         fontFamily: 'serif',
         borderLeft: '3px solid var(--accent)'
       }}>
@@ -190,7 +190,7 @@ export default function Quiz({
             style={{ 
               borderColor: correct ? '#4ade80' : showHint ? '#f87171' : 'var(--border)', 
               background: 'var(--bg-card)', 
-              color: '#e5e5e5'
+              color: '#ffffff'
             }}
             autoFocus
           />
