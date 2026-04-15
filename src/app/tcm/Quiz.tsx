@@ -88,7 +88,7 @@ export default function Quiz({
   const hint = blanks[currentIndex]?.hint || "";
 
   // 挖空模式：显示前半部分，后半部分挖空
-  if (mode2 === "blank") {
+  if (mode2 as string === "blank") {
     const chars = currentAnswer.split('');
     const keepCount = Math.min(4, Math.floor(chars.length * 0.4));
     const displayText = chars.map((c, i) => 
@@ -102,14 +102,14 @@ export default function Quiz({
           <button
             onClick={() => switchMode("blank")}
             className="px-3 py-1 rounded text-sm"
-            style={{ background: mode2 === 'blank' ? 'var(--accent)' : '#333', color: '#fff' }}
+            style={{ background: mode2 as string === 'blank' ? 'var(--accent)' : '#333', color: '#fff' }}
           >
             挖空模式
           </button>
           <button
             onClick={() => switchMode("recall")}
             className="px-3 py-1 rounded text-sm"
-            style={{ background: mode2 === 'recall' ? 'var(--accent)' : '#333', color: '#fff' }}
+            style={{ background: (mode2 as string) === 'recall' ? 'var(--accent)' : '#333', color: '#fff' }}
           >
             背下一句
           </button>
@@ -191,14 +191,14 @@ export default function Quiz({
         <button
           onClick={() => switchMode("blank")}
           className="px-3 py-1 rounded text-sm"
-          style={{ background: mode2 === 'blank' ? 'var(--accent)' : '#333', color: '#fff' }}
+          style={{ background: mode2 as string === 'blank' ? 'var(--accent)' : '#333', color: '#fff' }}
         >
           挖空模式
         </button>
         <button
           onClick={() => switchMode("recall")}
           className="px-3 py-1 rounded text-sm"
-          style={{ background: mode2 === 'recall' ? 'var(--accent)' : '#333', color: '#fff' }}
+          style={{ background: mode2 as string === 'recall' ? 'var(--accent)' : '#333', color: '#fff' }}
         >
           背下一句
         </button>
