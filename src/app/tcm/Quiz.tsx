@@ -87,15 +87,13 @@ export default function Quiz({
   const prevAnswer = currentIndex > 0 ? blanks[currentIndex - 1].answer : "";
   const hint = blanks[currentIndex]?.hint || "";
 
-  // 挖空模式：显示完整句子，挖空关键部分（用_____表示）
+  // 挖空模式：显示前半部分，后半部分挖空
   if (mode2 === "blank") {
-    // 把答案中部分内容挖空，用 ____ 代替
     const chars = currentAnswer.split('');
-    const hideCount = Math.max(2, Math.floor(chars.length * 0.6));
-    const startHide = Math.floor((chars.length - hideCount) / 2);
+    const keepCount = Math.min(4, Math.floor(chars.length * 0.4));
     const displayText = chars.map((c, i) => 
-      i >= startHide && i < startHide + hideCount ? '_' : c
-    ).join('').replace(/_+/g, '___');
+      i < keepCount ? c : '_'
+    ).join('').replace(/_+/g, '———');
     
     return (
       <div>
