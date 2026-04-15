@@ -382,3 +382,32 @@ a:hover {
 button, .btn {
   border-radius: 0 !important;
 }
+/* TCM Quiz 按钮强制可点击 */
+.card button {
+  pointer-events: auto !important;
+  position: relative !important;
+  z-index: 100 !important;
+}
+
+.card button:hover {
+  opacity: 0.9;
+}
+
+.card button:active {
+  transform: scale(0.98);
+}
+
+/* 链接形式的按钮也强制可点击 */
+.card a {
+  pointer-events: auto !important;
+  position: relative !important;
+  z-index: 100 !important;
+}
+
+.card a:hover {
+  opacity: 0.9;
+}
+
+.card a:active {
+  transform: scale(0.98);
+}
