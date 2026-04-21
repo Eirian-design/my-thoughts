@@ -1,36 +1,95 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
+import { useEditor, EditorContent } from "@tiptap/react";
+import StarterKit from "@tiptap/starter-kit";
+import Image from "@tiptap/extension-image";
+import Placeholder from "@tiptap/extension-placeholder";
 
 const GITHUB_REPO = "Eirian-design/my-thoughts";
 const POSTS_FILE = "src/data/posts.ts";
 
-type ContentBlock = 
-  | { type: "paragraph"; content: string }
-  | { type: "heading2"; content: string }
-  | { type: "heading3"; content: string }
-  | { type: "image"; url: string; caption?: string }
-  | { type: "video"; url: string }
-  | { type: "audio"; url: string }
-  | { type: "divider" }
-  | { type: "quote"; content: string };
+// 工具栏按钮组件
+function ToolbarButton({
+  active,
+  onClick,
+  children,
+  title,
+}: {
+  active?: boolean;
+  onClick: () => void;
+  children: React.ReactNode;
+  title: string;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      title={title}
+      className="w-8 h-8 flex items-center justify-center rounded hover:opacity-70 transition-opacity text-sm"
+      style={{
+        background: active ? "var(--accent)" : "var(--bg)",
+        color: active ? "#fff" : "#e5e5e5",
+      }}
+    >
+      {children}
+    </button>
+  );
+}
+
+function Divider() {
+  return (
+    <div
+      className="w-px h-6 mx-1"
+      style={{ background: "var(--border)" }}
+    />
+  );
+}
 
 export default function AdminPage() {
   const [password, setPassword] = useState("");
-  const [token, setToken] = useState("");
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [githubToken, setGithubToken] = useState("");
   const [title, setTitle] = useState("");
   const [excerpt, setExcerpt] = useState("");
-  const [blocks, setBlocks] = useState<ContentBlock[]>([{ type: "paragraph", content: "" }]);
   const [tags, setTags] = useState("");
   const [author, setAuthor] = useState("");
   const [date, setDate] = useState(new Date().toISOString().split("T")[0]);
   const [isPublishing, setIsPublishing] = useState(false);
-  const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
-  const [activeBlock, setActiveBlock] = useState<number | null>(null);
-  const [posts, setPosts] = useState<{id: string; title: string; date: string}[]>([]);
+  const [message, setMessage] = useState<{
+    type: "success" | "error";
+    text: string;
+  } | null>(null);
+  const [posts, setPosts] = useState<
+    { id: string; title: string; date: string }[]
+  >([]);
   const [showPostList, setShowPostList] = useState(false);
+  const [editingPostId, setEditingPostId] = useState<string | null>(null);
+
+  // TipTap 编辑器
+  const editor = useEditor({
+    extensions: [
+      StarterKit.configure({
+        heading: { levels: [2, 3] },
+      }),
+      Image.configure({
+        inline: false,
+        allowBase64: true,
+      }),
+      Placeholder.configure({
+        placeholder: "在这里开始写作... 可以直接粘贴带格式的文字",
+      }),
+    ],
+    editorProps: {
+      attributes: {
+        class:
+          "prose prose-lg max-w-none focus:outline-none min-h-[400px] px-4 py-3",
+        style:
+          "color: #1a1a1a; font-family: 'Lora', 'Noto Serif SC', Georgia, serif; font-size: 17px; line-height: 1.85;",
+      },
+    },
+    immediatelyRender: false,
+  });
 
   // 加载保存的 token
   useEffect(() => {
@@ -39,56 +98,152 @@ export default function AdminPage() {
   }, []);
 
   // 加载文章列表
-  const fetchPosts = async () => {
+  const fetchPosts = useCallback(async () => {
     if (!githubToken) return;
     try {
-      const res = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/contents/${POSTS_FILE}`, {
-        headers: { Authorization: `token ${githubToken}` },
-      });
+      const res = await fetch(
+        `https://api.github.com/repos/${GITHUB_REPO}/contents/${POSTS_FILE}`,
+        {
+          headers: { Authorization: `token ${githubToken}` },
+        }
+      );
       const data = await res.json();
       const content = decodeURIComponent(escape(atob(data.content)));
       const postMatches = content.match(/\{\s*id:\s*"[^"]+"[^}]+\}/g);
       if (postMatches) {
-        const parsed = postMatches.map(p => {
-          const idMatch = p.match(/id:\s*"([^"]+)"/);
-          const titleMatch = p.match(/title:\s*"([^"]+)"/);
-          const dateMatch = p.match(/date:\s*"([^"]+)"/);
-          return { id: idMatch?.[1] || "", title: titleMatch?.[1] || "", date: dateMatch?.[1] || "" };
-        }).filter(p => p.id && p.title);
+        const parsed = postMatches
+          .map((p) => {
+            const idMatch = p.match(/id:\s*"([^"]+)"/);
+            const titleMatch = p.match(/title:\s*"([^"]+)"/);
+            const dateMatch = p.match(/date:\s*"([^"]+)"/);
+            return {
+              id: idMatch?.[1] || "",
+              title: titleMatch?.[1] || "",
+              date: dateMatch?.[1] || "",
+            };
+          })
+          .filter((p) => p.id && p.title);
         setPosts(parsed);
       }
-    } catch (e) { console.error("Failed to fetch posts", e); }
-  };
+    } catch (e) {
+      console.error("Failed to fetch posts", e);
+    }
+  }, [githubToken]);
 
   // 删除文章
   const handleDeletePost = async (postId: string) => {
     if (!confirm("确定要删除这篇文章吗？")) return;
-    if (!githubToken) { alert("请先填写 GitHub Token"); return; }
+    if (!githubToken) {
+      alert("请先填写 GitHub Token");
+      return;
+    }
     try {
-      const res = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/contents/${POSTS_FILE}`, {
-        headers: { Authorization: `token ${githubToken}` },
-      });
+      const res = await fetch(
+        `https://api.github.com/repos/${GITHUB_REPO}/contents/${POSTS_FILE}`,
+        {
+          headers: { Authorization: `token ${githubToken}` },
+        }
+      );
       const data = await res.json();
       let content = decodeURIComponent(escape(atob(data.content)));
-      // 找到 id: "postId" 所在的整个文章块
       const startIdx = content.indexOf(`id: "${postId}"`);
-      if (startIdx === -1) { alert("找不到文章"); return; }
-      // 向前找到开头的 {
-      let start = content.lastIndexOf('\n  {', startIdx);
-      if (start === -1) start = content.indexOf('{', startIdx - 20);
-      // 向后找到结尾的 },
-      let end = content.indexOf('\n  },', startIdx);
-      if (end === -1) end = content.indexOf('},', startIdx);
+      if (startIdx === -1) {
+        alert("找不到文章");
+        return;
+      }
+      let start = content.lastIndexOf("\n  {", startIdx);
+      if (start === -1) start = content.indexOf("{", startIdx - 20);
+      let end = content.indexOf("\n  },", startIdx);
+      if (end === -1) end = content.indexOf("},", startIdx);
       if (end !== -1) end += 3;
-      // 删除文章块
-      content = content.slice(0, start).trim() + content.slice(end).trim();
-      const body = { message: `删除文章: ${postId}`, content: btoa(unescape(encodeURIComponent(content))), sha: data.sha };
-      const putRes = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/contents/${POSTS_FILE}`, {
-        method: "PUT", headers: { Authorization: `token ${githubToken}`, "Content-Type": "application/json" },
-        body: JSON.stringify(body),
-      });
-      if (putRes.ok) { alert("删除成功！"); fetchPosts(); } else { alert("删除失败: " + putRes.status); }
-    } catch (e) { alert("删除失败: " + e); }
+      content =
+        content.slice(0, start).trim() + content.slice(end).trim();
+      const body = {
+        message: `删除文章: ${postId}`,
+        content: btoa(unescape(encodeURIComponent(content))),
+        sha: data.sha,
+      };
+      const putRes = await fetch(
+        `https://api.github.com/repos/${GITHUB_REPO}/contents/${POSTS_FILE}`,
+        {
+          method: "PUT",
+          headers: {
+            Authorization: `token ${githubToken}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(body),
+        }
+      );
+      if (putRes.ok) {
+        alert("删除成功！");
+        fetchPosts();
+      } else {
+        alert("删除失败: " + putRes.status);
+      }
+    } catch (e) {
+      alert("删除失败: " + e);
+    }
+  };
+
+  // 编辑文章：加载内容到编辑器
+  const handleEditPost = async (postId: string) => {
+    if (!githubToken) {
+      alert("请先填写 GitHub Token");
+      return;
+    }
+    try {
+      const res = await fetch(
+        `https://api.github.com/repos/${GITHUB_REPO}/contents/${POSTS_FILE}`,
+        {
+          headers: { Authorization: `token ${githubToken}` },
+        }
+      );
+      const data = await res.json();
+      const content = decodeURIComponent(escape(atob(data.content)));
+      const postMatches = content.match(
+        /\{[\s\S]*?id:\s*"` + postId.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + `"[\s\S]*?\n  \},/g
+      );
+      if (!postMatches || postMatches.length === 0) {
+        alert("找不到文章内容");
+        return;
+      }
+      const postText = postMatches[0];
+      const titleMatch = postText.match(/title:\s*"([^"]*)"/);
+      const dateMatch = postText.match(/date:\s*"([^"]*)"/);
+      const excerptMatch = postText.match(/excerpt:\s*`([^`]*)`/);
+      const tagsMatch = postText.match(/tags:\s*(\[[^\]]*\])/);
+      const authorMatch = postText.match(/author:\s*"([^"]*)"/);
+
+      if (titleMatch) setTitle(titleMatch[1]);
+      if (dateMatch) setDate(dateMatch[1]);
+      if (excerptMatch) setExcerpt(excerptMatch[1]);
+      if (authorMatch) setAuthor(authorMatch[1]);
+
+      // 解析 tags
+      if (tagsMatch) {
+        try {
+          const tagsArray = JSON.parse(tagsMatch[1]);
+          setTags(tagsArray.join(", "));
+        } catch {
+          setTags("");
+        }
+      }
+
+      // 提取 content 字段中的 HTML
+      const contentMatch = postText.match(/content:\s*`([\s\S]*?)`/);
+      if (contentMatch) {
+        const htmlContent = contentMatch[1]
+          .replace(/\\`/g, "`")
+          .replace(/\\"/g, '"');
+        editor?.commands.setContent(htmlContent);
+      }
+
+      setEditingPostId(postId);
+      setShowPostList(false);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    } catch (e) {
+      alert("加载文章失败: " + e);
+    }
   };
 
   const handleLogin = (e: React.FormEvent) => {
@@ -107,81 +262,87 @@ export default function AdminPage() {
     }
   };
 
-  const addBlock = (type: ContentBlock["type"]) => {
-    const newBlock: ContentBlock = 
-      type === "divider" ? { type: "divider" } :
-      type === "image" ? { type: "image", url: "", caption: "" } :
-      type === "video" ? { type: "video", url: "" } :
-      type === "audio" ? { type: "audio", url: "" } :
-      { type: "paragraph", content: "" };
-    
-    const insertIndex = activeBlock !== null ? activeBlock + 1 : blocks.length;
-    const newBlocks = [...blocks];
-    newBlocks.splice(insertIndex, 0, newBlock);
-    setBlocks(newBlocks);
-    setActiveBlock(insertIndex);
-  };
-
-  const updateBlock = (index: number, block: Partial<ContentBlock> & { type: ContentBlock["type"] }) => {
-    const newBlocks = [...blocks];
-    newBlocks[index] = block as ContentBlock;
-    setBlocks(newBlocks);
-  };
-
-  const removeBlock = (index: number) => {
-    if (blocks.length > 1) {
-      const newBlocks = blocks.filter((_, i) => i !== index);
-      setBlocks(newBlocks);
-      setActiveBlock(null);
+  // 插入图片
+  const addImage = () => {
+    const url = prompt("请输入图片 URL：");
+    if (url) {
+      editor?.chain().focus().setImage({ src: url }).run();
     }
   };
 
-  const moveBlock = (index: number, direction: "up" | "down") => {
-    if (
-      (direction === "up" && index === 0) ||
-      (direction === "down" && index === blocks.length - 1)
-    ) return;
-
-    const newBlocks = [...blocks];
-    const targetIndex = direction === "up" ? index - 1 : index + 1;
-    [newBlocks[index], newBlocks[targetIndex]] = [newBlocks[targetIndex], newBlocks[index]];
-    setBlocks(newBlocks);
+  // 上传图片到 GitHub
+  const uploadImage = async (
+    file: File
+  ): Promise<string | null> => {
+    if (!githubToken) {
+      alert("请先填写 GitHub Token");
+      return null;
+    }
+    const sha = await getFileSha(
+      `public/images/${file.name}`
+    );
+    const reader = new FileReader();
+    return new Promise((resolve) => {
+      reader.onload = async () => {
+        try {
+          const base64 = (reader.result as string).split(",")[1];
+          const body: Record<string, unknown> = {
+            message: `upload: ${file.name}`,
+            content: base64,
+          };
+          if (sha) body.sha = sha;
+          const res = await fetch(
+            `https://api.github.com/repos/${GITHUB_REPO}/contents/public/images/${file.name}`,
+            {
+              method: "PUT",
+              headers: {
+                Authorization: `token ${githubToken}`,
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify(body),
+            }
+          );
+          if (res.ok) {
+            resolve(`https://eirian.top/images/${file.name}`);
+          } else {
+            resolve(null);
+          }
+        } catch {
+          resolve(null);
+        }
+      };
+      reader.readAsDataURL(file);
+    });
   };
 
-  // 生成纯文本内容（保留给不支持富文本的地方）
-  const generatePlainContent = () => {
-    return blocks
-      .map(block => {
-        if (block.type === "divider") return "---";
-        if (block.type === "image") return `[图片: ${block.caption || block.url}]`;
-        if (block.type === "video") return `[视频: ${block.url}]`;
-        if (block.type === "audio") return `[音频: ${block.url}]`;
-        return block.content;
-      })
-      .join("\n\n");
+  // 处理本地图片上传
+  const handleLocalImageUpload = async () => {
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = "image/*";
+    input.onchange = async (e) => {
+      const file = (e.target as HTMLInputElement).files?.[0];
+      if (!file) return;
+      const url = await uploadImage(file);
+      if (url) {
+        editor?.chain().focus().setImage({ src: url }).run();
+      } else {
+        alert("上传失败");
+      }
+    };
+    input.click();
   };
 
-  // 生成 Markdown 内容
-  const generateMarkdown = () => {
-    return blocks
-      .map(block => {
-        if (block.type === "heading2") return `## ${block.content}`;
-        if (block.type === "heading3") return `### ${block.content}`;
-        if (block.type === "divider") return "---";
-        if (block.type === "image") return `![${block.caption || ""}](${block.url})`;
-        if (block.type === "video") return `<video src="${block.url}" controls></video>`;
-        if (block.type === "audio") return `<audio src="${block.url}" controls></audio>`;
-        if (block.type === "quote") return `> ${block.content}`;
-        return block.content;
-      })
-      .join("\n\n");
-  };
-
-  const getFileSha = async (path: string): Promise<string | null> => {
+  const getFileSha = async (
+    path: string
+  ): Promise<string | null> => {
     try {
-      const res = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/contents/${path}`, {
-        headers: { Authorization: `token ${githubToken}` },
-      });
+      const res = await fetch(
+        `https://api.github.com/repos/${GITHUB_REPO}/contents/${path}`,
+        {
+          headers: { Authorization: `token ${githubToken}` },
+        }
+      );
       if (!res.ok) return null;
       const data = await res.json();
       return data.sha;
@@ -190,106 +351,29 @@ export default function AdminPage() {
     }
   };
 
-  // 上传文件到 GitHub
-  const uploadFile = async (file: File, folder: string = "uploads"): Promise<string | null> => {
-    if (!githubToken) {
-      alert("请先填写 GitHub Token");
-      return null;
-    }
-
-    const ext = file.name.split(".").pop() || "";
-    const timestamp = Date.now();
-    const safeName = file.name.replace(/[^a-zA-Z0-9.-]/g, "_");
-    const fileName = `${timestamp}-${safeName}`;
-    const path = `public/${folder}/${fileName}`;
-
-    return new Promise((resolve) => {
-      const reader = new FileReader();
-      reader.onload = async () => {
-        try {
-          const base64 = (reader.result as string).split(",")[1];
-          const sha = await getFileSha(path);
-          
-          const body: Record<string, unknown> = {
-            message: `upload: ${fileName}`,
-            content: base64,
-          };
-          if (sha) body.sha = sha;
-
-          const res = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/contents/${path}`, {
-            method: "PUT",
-            headers: {
-              Authorization: `token ${githubToken}`,
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify(body),
-          });
-
-          if (res.ok) {
-            // 返回 CDN URL
-            const url = `https://eirian.top/${folder}/${fileName}`;
-            resolve(url);
-          } else {
-            console.error("Upload failed:", await res.text());
-            resolve(null);
-          }
-        } catch (err) {
-          console.error("Upload error:", err);
-          resolve(null);
-        }
-      };
-      reader.readAsDataURL(file);
-    });
-  };
-
-  // 处理图片上传
-  const handleImageUpload = async (index: number, e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    const currentBlock = blocks[index] as { url?: string };
-    updateBlock(index, { ...currentBlock, url: "上传中..." } as ContentBlock);
-    const url = await uploadFile(file, "images");
-    if (url) {
-      updateBlock(index, { ...currentBlock, url } as ContentBlock);
-    } else {
-      updateBlock(index, { ...currentBlock, url: "" } as ContentBlock);
-      alert("上传失败，请重试");
-    }
-  };
-
-  // 处理视频/音频上传
-  const handleMediaUpload = async (index: number, e: React.ChangeEvent<HTMLInputElement>, type: "video" | "audio") => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    const currentBlock = blocks[index] as { url?: string };
-    const folder = type === "video" ? "videos" : "audio";
-    updateBlock(index, { ...currentBlock, url: "上传中..." } as ContentBlock);
-    const url = await uploadFile(file, folder);
-    if (url) {
-      updateBlock(index, { ...currentBlock, url } as ContentBlock);
-    } else {
-      updateBlock(index, { ...currentBlock, url: "" } as ContentBlock);
-      alert("上传失败，请重试");
-    }
-  };
-
-  const updateFile = async (path: string, content: string, sha?: string) => {
+  const updateFile = async (
+    path: string,
+    content: string,
+    sha?: string
+  ) => {
     const body: Record<string, unknown> = {
-      message: `feat: 添加文章 "${title}"`,
+      message: editingPostId
+        ? `编辑文章: ${title}`
+        : `feat: 添加文章 "${title}"`,
       content: btoa(unescape(encodeURIComponent(content))),
     };
     if (sha) body.sha = sha;
-
-    const res = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/contents/${path}`, {
-      method: "PUT",
-      headers: {
-        Authorization: `token ${githubToken}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(body),
-    });
+    const res = await fetch(
+      `https://api.github.com/repos/${GITHUB_REPO}/contents/${path}`,
+      {
+        method: "PUT",
+        headers: {
+          Authorization: `token ${githubToken}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(body),
+      }
+    );
     return res.ok;
   };
 
@@ -303,6 +387,10 @@ export default function AdminPage() {
       alert("请先填写 GitHub Token");
       return;
     }
+    if (!editor?.getText()) {
+      alert("请输入文章内容");
+      return;
+    }
 
     setIsPublishing(true);
     setMessage(null);
@@ -310,35 +398,75 @@ export default function AdminPage() {
     try {
       const sha = await getFileSha(POSTS_FILE);
       if (!sha) {
-        setMessage({ type: "error", text: "无法获取文件信息，请检查 Token 权限" });
+        setMessage({
+          type: "error",
+          text: "无法获取文件信息，请检查 Token 权限",
+        });
         setIsPublishing(false);
         return;
       }
 
-      const res = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/contents/${POSTS_FILE}`, {
-        headers: { Authorization: `token ${githubToken}` },
-      });
+      const res = await fetch(
+        `https://api.github.com/repos/${GITHUB_REPO}/contents/${POSTS_FILE}`,
+        {
+          headers: { Authorization: `token ${githubToken}` },
+        }
+      );
       const data = await res.json();
-      const currentContent = decodeURIComponent(escape(atob(data.content)));
+      let currentContent = decodeURIComponent(
+        escape(atob(data.content))
+      );
 
-      const postId = title.toLowerCase().replace(/\s+/g, "-").replace(/[^\u4e00-\u9fa5a-z0-9-]/g, "");
-      const tagsArray = tags ? tags.split(",").map((t) => t.trim()) : [];
-      const content = generateMarkdown();
-      const excerptText = excerpt || blocks
-        .filter(b => b.type === "paragraph" && b.content)
-        .slice(0, 1)
-        .map(b => b.type === "paragraph" ? b.content.slice(0, 100) : "")
-        .join("") + "...";
-      
+      const postId =
+        editingPostId ||
+        title
+          .toLowerCase()
+          .replace(/\s+/g, "-")
+          .replace(/[^\u4e00-\u9fa5a-z0-9-]/g, "");
+      const tagsArray = tags
+        ? tags.split(",").map((t) => t.trim())
+        : [];
+      const htmlContent = editor.getHTML();
+      const excerptText =
+        excerpt ||
+        editor.getText().slice(0, 100) + "...";
+
+      // 如果是编辑模式，先删除旧文章
+      if (editingPostId) {
+        const startIdx = currentContent.indexOf(
+          `id: "${editingPostId}"`
+        );
+        if (startIdx !== -1) {
+          let start = currentContent.lastIndexOf(
+            "\n  {",
+            startIdx
+          );
+          if (start === -1)
+            start = currentContent.indexOf(
+              "{",
+              startIdx - 20
+            );
+          let end = currentContent.indexOf(
+            "\n  },",
+            startIdx
+          );
+          if (end === -1) end = currentContent.indexOf("},", startIdx);
+          if (end !== -1) end += 3;
+          currentContent =
+            currentContent.slice(0, start).trim() +
+            currentContent.slice(end).trim();
+        }
+      }
+
       const newPost = `
   {
     id: "${postId}",
-    title: "${title}",
-    excerpt: \`${excerptText}\`,
+    title: "${title.replace(/"/g, '\\"')}",
+    excerpt: \`${excerptText.replace(/`/g, "\\`")}\`,
     date: "${date}",
     tags: ${JSON.stringify(tagsArray)},
-    author: "${author || 'Eirian'}",
-    content: \`${content.replace(/`/g, "\\`")}\`,
+    author: "${author || "Eirian"}",
+    content: \`${htmlContent.replace(/`/g, "\\`")}\`,
   },`;
 
       const insertPosition = currentContent.lastIndexOf("];");
@@ -348,23 +476,46 @@ export default function AdminPage() {
         return;
       }
 
-      const newContent = currentContent.slice(0, insertPosition) + newPost + "\n" + currentContent.slice(insertPosition);
+      const newContent =
+        currentContent.slice(0, insertPosition) +
+        newPost +
+        "\n" +
+        currentContent.slice(insertPosition);
 
-      const success = await updateFile(POSTS_FILE, newContent, sha);
+      // 重新获取 sha（因为文件可能已被修改）
+      const latestSha = await getFileSha(POSTS_FILE);
+      const success = await updateFile(
+        POSTS_FILE,
+        newContent,
+        latestSha || sha
+      );
       if (success) {
-        setMessage({ type: "success", text: "文章发布成功！网站将自动更新。" });
+        setMessage({
+          type: "success",
+          text: editingPostId
+            ? "文章更新成功！网站将自动更新。"
+            : "文章发布成功！网站将自动更新。",
+        });
+        setEditingPostId(null);
         setTimeout(() => {
           setTitle("");
           setExcerpt("");
-          setBlocks([{ type: "paragraph", content: "" }]);
           setTags("");
+          setAuthor("");
+          editor?.commands.clearContent();
           setMessage(null);
         }, 3000);
       } else {
-        setMessage({ type: "error", text: "发布失败，请重试" });
+        setMessage({
+          type: "error",
+          text: "发布失败，请重试",
+        });
       }
     } catch (error) {
-      setMessage({ type: "error", text: "发生错误，请重试" });
+      setMessage({
+        type: "error",
+        text: "发生错误，请重试",
+      });
     }
 
     setIsPublishing(false);
@@ -372,12 +523,15 @@ export default function AdminPage() {
 
   if (!isLoggedIn) {
     return (
-      <div className="min-h-screen flex items-center justify-center px-4" style={{ background: 'var(--bg)' }}>
-        <form
-          onSubmit={handleLogin}
-          className="card p-8 rounded-xl w-full max-w-md"
-        >
-          <h1 className="text-2xl font-serif text-center mb-6" style={{ color: '#e5e5e5' }}>
+      <div
+        className="min-h-screen flex items-center justify-center px-4"
+        style={{ background: "var(--bg)" }}
+      >
+        <form onSubmit={handleLogin} className="card p-8 w-full max-w-md">
+          <h1
+            className="text-2xl font-serif text-center mb-6"
+            style={{ color: "#e5e5e5" }}
+          >
             管理后台
           </h1>
           <input
@@ -385,13 +539,18 @@ export default function AdminPage() {
             placeholder="请输入管理密码"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="w-full px-4 py-3 rounded-lg border mb-4"
-            style={{ borderColor: 'var(--border)', background: 'var(--bg-card)', color: '#e5e5e5' }}
+            className="w-full px-4 py-3 mb-4"
+            style={{
+              border: "1px solid var(--border)",
+              background: "var(--bg-card)",
+              color: "#e5e5e5",
+              borderRadius: 0,
+            }}
           />
           <button
             type="submit"
-            className="w-full py-3 rounded-lg text-white transition-colors"
-            style={{ background: 'var(--accent)' }}
+            className="w-full py-3 text-white"
+            style={{ background: "var(--accent)", borderRadius: 0 }}
           >
             登录
           </button>
@@ -403,26 +562,70 @@ export default function AdminPage() {
   return (
     <div className="max-w-4xl mx-auto pb-20">
       <div className="flex items-center justify-between mb-8">
-        <h1 className="text-2xl font-serif" style={{ color: '#e5e5e5' }}>撰写新文章</h1>
-        <button
-          onClick={() => setIsLoggedIn(false)}
-          className="text-sm hover:opacity-70"
-          style={{ color: '#888888' }}
+        <h1
+          className="text-2xl font-serif"
+          style={{ color: "#e5e5e5" }}
         >
-          退出登录
-        </button>
+          {editingPostId ? "编辑文章" : "撰写新文章"}
+        </h1>
+        <div className="flex gap-3">
+          {editingPostId && (
+            <button
+              onClick={() => {
+                setEditingPostId(null);
+                setTitle("");
+                setExcerpt("");
+                setTags("");
+                setAuthor("");
+                editor?.commands.clearContent();
+              }}
+              className="text-sm hover:opacity-70 px-3 py-1"
+              style={{
+                color: "#888",
+                border: "1px solid var(--border)",
+                borderRadius: 0,
+              }}
+            >
+              取消编辑
+            </button>
+          )}
+          <button
+            onClick={() => setIsLoggedIn(false)}
+            className="text-sm hover:opacity-70"
+            style={{ color: "#888" }}
+          >
+            退出登录
+          </button>
+        </div>
       </div>
 
       {/* GitHub Token 设置 */}
-      <div className="card rounded-lg p-4 mb-6" style={{ borderLeft: '3px solid var(--accent)' }}>
+      <div
+        className="p-4 mb-6"
+        style={{
+          borderLeft: "3px solid var(--accent)",
+          background: "var(--bg-card)",
+        }}
+      >
         <div className="flex justify-between items-center mb-2">
-          <label className="block text-sm" style={{ color: '#e5e5e5' }}>🔑 GitHub Token（自动发布用）</label>
-          <button
-            onClick={() => { fetchPosts(); setShowPostList(!showPostList); }}
-            className="px-3 py-1 rounded text-sm"
-            style={{ background: showPostList ? '#4CAF50' : '#666', color: '#fff' }}
+          <label
+            className="block text-sm"
+            style={{ color: "#e5e5e5" }}
           >
-            {showPostList ? '✅ 已展开' : '📋 文章列表'}
+            GitHub Token（发布用）
+          </label>
+          <button
+            onClick={() => {
+              fetchPosts();
+              setShowPostList(!showPostList);
+            }}
+            className="px-3 py-1 text-sm text-white"
+            style={{
+              background: showPostList ? "#4CAF50" : "#666",
+              borderRadius: 0,
+            }}
+          >
+            {showPostList ? "已展开" : "文章列表"}
           </button>
         </div>
         <div className="flex gap-2">
@@ -431,43 +634,82 @@ export default function AdminPage() {
             value={githubToken}
             onChange={(e) => setGithubToken(e.target.value)}
             placeholder="粘贴你的 GitHub Token"
-            className="flex-1 px-4 py-2 rounded-lg border"
-            style={{ borderColor: 'var(--border)', background: 'var(--bg-card)', color: '#e5e5e5' }}
+            className="flex-1 px-4 py-2"
+            style={{
+              border: "1px solid var(--border)",
+              background: "#fff",
+              color: "#333",
+              borderRadius: 0,
+            }}
           />
           <button
             onClick={saveToken}
-            className="px-4 py-2 rounded-lg text-white text-sm"
-            style={{ background: 'var(--accent)' }}
+            className="px-4 py-2 text-white text-sm"
+            style={{ background: "var(--accent)", borderRadius: 0 }}
           >
             保存
           </button>
         </div>
-        <p className="text-xs mt-1" style={{ color: '#888888' }}>
-          Token 需要 repo 权限。保存后会保存在浏览器本地。
+        <p className="text-xs mt-1" style={{ color: "#888" }}>
+          Token 需要 repo 权限。保存后存在浏览器本地。
         </p>
       </div>
 
-      {/* 文章列表 - 可展开 */}
+      {/* 文章列表 */}
       {showPostList && (
-        <div className="card rounded-lg p-4 mb-6">
-          <h3 className="text-lg font-medium mb-4" style={{ color: '#e5e5e5' }}>已有文章 ({posts.length})</h3>
+        <div
+          className="p-4 mb-6"
+          style={{ background: "var(--bg-card)" }}
+        >
+          <h3
+            className="text-lg font-medium mb-4"
+            style={{ color: "#e5e5e5" }}
+          >
+            已有文章 ({posts.length})
+          </h3>
           {posts.length === 0 ? (
-            <p style={{ color: '#888888' }}>暂无文章</p>
+            <p style={{ color: "#888" }}>暂无文章</p>
           ) : (
             <div className="space-y-2 max-h-64 overflow-y-auto">
-              {posts.map(post => (
-                <div key={post.id} className="flex justify-between items-center p-2 rounded" style={{ background: 'var(--bg)' }}>
+              {posts.map((post) => (
+                <div
+                  key={post.id}
+                  className="flex justify-between items-center p-2"
+                  style={{ background: "var(--bg)" }}
+                >
                   <div>
-                    <span style={{ color: '#e5e5e5' }}>{post.title}</span>
-                    <span className="ml-2 text-sm" style={{ color: '#888888' }}>{post.date}</span>
+                    <span style={{ color: "#e5e5e5" }}>
+                      {post.title}
+                    </span>
+                    <span
+                      className="ml-2 text-sm"
+                      style={{ color: "#888" }}
+                    >
+                      {post.date}
+                    </span>
                   </div>
-                  <button
-                    onClick={() => handleDeletePost(post.id)}
-                    className="px-3 py-1 rounded text-sm"
-                    style={{ background: '#ff4444', color: '#fff' }}
-                  >
-                    删除
-                  </button>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => handleEditPost(post.id)}
+                      className="px-3 py-1 text-sm text-white"
+                      style={{
+                        background: "#4CAF50",
+                        borderRadius: 0,
+                      }}
+                    >
+                      编辑
+                    </button>
+                    <button
+                      onClick={() => handleDeletePost(post.id)}
+                      className="px-3 py-1 text-sm text-white"
+                      style={{
+                        background: "#ff4444",
+                        borderRadius: 0,
+                      }}
+                    >
+                      删除
+                    </button>
+                  </div>
                 </div>
               ))}
             </div>
@@ -476,366 +718,256 @@ export default function AdminPage() {
       )}
 
       <form onSubmit={handlePublish} className="space-y-6">
+        {/* 标题和日期 */}
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm mb-2" style={{ color: '#888888' }}>标题 *</label>
+            <label
+              className="block text-sm mb-2"
+              style={{ color: "#888" }}
+            >
+              标题 *
+            </label>
             <input
               type="text"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="输入文章标题"
-              className="w-full px-4 py-3 rounded-lg border"
-              style={{ borderColor: 'var(--border)', background: 'var(--bg-card)', color: '#e5e5e5' }}
+              className="w-full px-4 py-3"
+              style={{
+                border: "1px solid var(--border)",
+                background: "#fff",
+                color: "#333",
+                borderRadius: 0,
+              }}
             />
           </div>
           <div>
-            <label className="block text-sm mb-2" style={{ color: '#888888' }}>发布日期</label>
+            <label
+              className="block text-sm mb-2"
+              style={{ color: "#888" }}
+            >
+              发布日期
+            </label>
             <input
               type="date"
               value={date}
               onChange={(e) => setDate(e.target.value)}
-              className="w-full px-4 py-3 rounded-lg border"
-              style={{ borderColor: 'var(--border)', background: 'var(--bg-card)', color: '#e5e5e5' }}
+              className="w-full px-4 py-3"
+              style={{
+                border: "1px solid var(--border)",
+                background: "#fff",
+                color: "#333",
+                borderRadius: 0,
+              }}
             />
           </div>
         </div>
 
-        <div>
-          <label className="block text-sm mb-2" style={{ color: '#888888' }}>摘要</label>
-          <input
-            type="text"
-            value={excerpt}
-            onChange={(e) => setExcerpt(e.target.value)}
-            placeholder="简短描述（可选）"
-            className="w-full px-4 py-3 rounded-lg border"
-            style={{ borderColor: 'var(--border)', background: 'var(--bg-card)', color: '#e5e5e5' }}
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm mb-2" style={{ color: '#888888' }}>标签（用逗号分隔）</label>
-          <input
-            type="text"
-            value={tags}
-            onChange={(e) => setTags(e.target.value)}
-            placeholder="如：随笔, 思考, 写作"
-            className="w-full px-4 py-3 rounded-lg border"
-            style={{ borderColor: 'var(--border)', background: 'var(--bg-card)', color: '#e5e5e5' }}
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm mb-2" style={{ color: '#888888' }}>作者（可选）</label>
-          <input
-            type="text"
-            value={author}
-            onChange={(e) => setAuthor(e.target.value)}
-            placeholder="默认为 Eirian"
-            className="w-full px-4 py-3 rounded-lg border"
-            style={{ borderColor: 'var(--border)', background: 'var(--bg-card)', color: '#e5e5e5' }}
-          />
-        </div>
-
-        {/* 富文本工具栏 */}
-        <div className="card rounded-lg p-3 flex flex-wrap gap-2" style={{ background: 'var(--bg-card)' }}>
-          <span className="text-xs mr-2" style={{ color: '#888888' }}>插入:</span>
-          <button
-            type="button"
-            onClick={() => addBlock("heading2")}
-            className="px-3 py-1 rounded text-sm font-bold hover:opacity-70"
-            style={{ background: 'var(--bg)', color: '#e5e5e5' }}
-          >
-            H2
-          </button>
-          <button
-            type="button"
-            onClick={() => addBlock("heading3")}
-            className="px-3 py-1 rounded text-sm font-bold hover:opacity-70"
-            style={{ background: 'var(--bg)', color: '#e5e5e5' }}
-          >
-            H3
-          </button>
-          <button
-            type="button"
-            onClick={() => addBlock("image")}
-            className="px-3 py-1 rounded text-sm hover:opacity-70"
-            style={{ background: 'var(--bg)', color: '#e5e5e5' }}
-          >
-            🖼️ 图片
-          </button>
-          <button
-            type="button"
-            onClick={() => addBlock("video")}
-            className="px-3 py-1 rounded text-sm hover:opacity-70"
-            style={{ background: 'var(--bg)', color: '#e5e5e5' }}
-          >
-            🎬 视频
-          </button>
-          <button
-            type="button"
-            onClick={() => addBlock("audio")}
-            className="px-3 py-1 rounded text-sm hover:opacity-70"
-            style={{ background: 'var(--bg)', color: '#e5e5e5' }}
-          >
-            🎵 音频
-          </button>
-          <button
-            type="button"
-            onClick={() => addBlock("divider")}
-            className="px-3 py-1 rounded text-sm hover:opacity-70"
-            style={{ background: 'var(--bg)', color: '#e5e5e5' }}
-          >
-            ➖ 分割线
-          </button>
-          <button
-            type="button"
-            onClick={() => addBlock("quote")}
-            className="px-3 py-1 rounded text-sm hover:opacity-70"
-            style={{ background: 'var(--bg)', color: '#e5e5e5' }}
-          >
-            ❝ 引用
-          </button>
-          <button
-            type="button"
-            onClick={() => addBlock("paragraph")}
-            className="px-3 py-1 rounded text-sm hover:opacity-70"
-            style={{ background: 'var(--bg)', color: '#e5e5e5' }}
-          >
-            📝 文本
-          </button>
-        </div>
-
-        {/* 内容块编辑 */}
-        <div className="space-y-4">
-          {blocks.map((block, index) => (
-            <div 
-              key={index} 
-              className="card rounded-lg p-4 relative group"
-              style={{ 
-                borderLeft: activeBlock === index ? '3px solid var(--accent)' : '3px solid transparent' 
-              }}
+        {/* 摘要和标签 */}
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label
+              className="block text-sm mb-2"
+              style={{ color: "#888" }}
             >
-              {/* 块操作按钮 */}
-              <div className="absolute -left-12 top-2 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col gap-1">
-                <button
-                  type="button"
-                  onClick={() => moveBlock(index, "up")}
-                  className="w-8 h-8 rounded hover:opacity-70 flex items-center justify-center"
-                  style={{ background: 'var(--bg-card)', color: '#888888' }}
-                  title="上移"
-                >
-                  ↑
-                </button>
-                <button
-                  type="button"
-                  onClick={() => moveBlock(index, "down")}
-                  className="w-8 h-8 rounded hover:opacity-70 flex items-center justify-center"
-                  style={{ background: 'var(--bg-card)', color: '#888888' }}
-                  title="下移"
-                >
-                  ↓
-                </button>
-                <button
-                  type="button"
-                  onClick={() => removeBlock(index)}
-                  className="w-8 h-8 rounded hover:opacity-70 flex items-center justify-center"
-                  style={{ background: 'var(--bg-card)', color: 'var(--accent)' }}
-                  title="删除"
-                >
-                  ×
-                </button>
-              </div>
-
-              {/* 块类型标签 */}
-              <div className="flex items-center gap-2 mb-2">
-                <select
-                  value={block.type}
-                  onChange={(e) => {
-                    const newType = e.target.value as ContentBlock["type"];
-                    updateBlock(index, { ...block, type: newType });
-                  }}
-                  className="text-xs px-2 py-1 rounded border"
-                  style={{ borderColor: 'var(--border)', background: 'var(--bg)', color: '#888888' }}
-                >
-                  <option value="paragraph">文本段落</option>
-                  <option value="heading2">二级标题</option>
-                  <option value="heading3">三级标题</option>
-                  <option value="image">图片</option>
-                  <option value="video">视频</option>
-                  <option value="audio">音频</option>
-                  <option value="divider">分割线</option>
-                  <option value="quote">引用</option>
-                </select>
-                <span className="text-xs" style={{ color: '#888888' }}>#{index + 1}</span>
-              </div>
-
-              {/* 块内容编辑 */}
-              {block.type === "paragraph" && (
-                <textarea
-                  value={block.content}
-                  onChange={(e) => updateBlock(index, { ...block, content: e.target.value })}
-                  onFocus={() => setActiveBlock(index)}
-                  placeholder="在这里输入文本..."
-                  rows={3}
-                  className="w-full px-3 py-2 rounded border resize-y"
-                  style={{ borderColor: 'var(--border)', background: 'var(--bg-card)', color: '#e5e5e5' }}
-                />
-              )}
-              {block.type === "heading2" && (
-                <input
-                  type="text"
-                  value={block.content}
-                  onChange={(e) => updateBlock(index, { ...block, content: e.target.value })}
-                  onFocus={() => setActiveBlock(index)}
-                  placeholder="二级标题..."
-                  className="w-full px-3 py-2 rounded border text-lg font-bold"
-                  style={{ borderColor: 'var(--border)', background: 'var(--bg-card)', color: '#e5e5e5' }}
-                />
-              )}
-              {block.type === "heading3" && (
-                <input
-                  type="text"
-                  value={block.content}
-                  onChange={(e) => updateBlock(index, { ...block, content: e.target.value })}
-                  onFocus={() => setActiveBlock(index)}
-                  placeholder="三级标题..."
-                  className="w-full px-3 py-2 rounded border text-base font-bold"
-                  style={{ borderColor: 'var(--border)', background: 'var(--bg-card)', color: '#e5e5e5' }}
-                />
-              )}
-              {block.type === "quote" && (
-                <textarea
-                  value={block.content}
-                  onChange={(e) => updateBlock(index, { ...block, content: e.target.value })}
-                  onFocus={() => setActiveBlock(index)}
-                  placeholder="引用内容..."
-                  rows={2}
-                  className="w-full px-3 py-2 rounded border italic"
-                  style={{ borderColor: 'var(--border)', background: 'var(--bg-card)', color: '#888888' }}
-                />
-              )}
-              {block.type === "image" && (
-                <div className="space-y-2">
-                  <div className="flex gap-2">
-                    <input
-                      type="url"
-                      value={block.url}
-                      onChange={(e) => updateBlock(index, { ...block, url: e.target.value })}
-                      onFocus={() => setActiveBlock(index)}
-                      placeholder="图片 URL"
-                      className="flex-1 px-3 py-2 rounded border"
-                      style={{ borderColor: 'var(--border)', background: 'var(--bg-card)', color: '#e5e5e5' }}
-                    />
-                    <label className="px-4 py-2 rounded cursor-pointer text-sm text-white" style={{ background: 'var(--accent)' }}>
-                      📁 本地上传
-                      <input
-                        type="file"
-                        accept="image/*"
-                        onChange={(e) => handleImageUpload(index, e)}
-                        className="hidden"
-                      />
-                    </label>
-                  </div>
-                  <input
-                    type="text"
-                    value={block.caption || ""}
-                    onChange={(e) => updateBlock(index, { ...block, caption: e.target.value })}
-                    placeholder="图片说明（可选）"
-                    className="w-full px-3 py-2 rounded border text-sm"
-                    style={{ borderColor: 'var(--border)', background: 'var(--bg-card)', color: '#888888' }}
-                  />
-                  {block.url && block.url !== "上传中..." && (
-                    <img src={block.url} alt="" className="max-h-40 rounded border" style={{ borderColor: 'var(--border)' }} />
-                  )}
-                  {block.url === "上传中..." && (
-                    <p className="text-sm" style={{ color: '#888888' }}>⏳ 上传中...</p>
-                  )}
-                </div>
-              )}
-              {block.type === "video" && (
-                <div className="space-y-2">
-                  <div className="flex gap-2">
-                    <input
-                      type="url"
-                      value={block.url}
-                      onChange={(e) => updateBlock(index, { ...block, url: e.target.value })}
-                      onFocus={() => setActiveBlock(index)}
-                      placeholder="视频 URL"
-                      className="flex-1 px-3 py-2 rounded border"
-                      style={{ borderColor: 'var(--border)', background: 'var(--bg-card)', color: '#e5e5e5' }}
-                    />
-                    <label className="px-4 py-2 rounded cursor-pointer text-sm text-white" style={{ background: 'var(--accent)' }}>
-                      📁 上传
-                      <input
-                        type="file"
-                        accept="video/*"
-                        onChange={(e) => handleMediaUpload(index, e, "video")}
-                        className="hidden"
-                      />
-                    </label>
-                  </div>
-                  {block.url && block.url !== "上传中..." && (
-                    <video src={block.url} controls className="max-h-48 rounded border" style={{ borderColor: 'var(--border)' }} />
-                  )}
-                  {block.url === "上传中..." && (
-                    <p className="text-sm" style={{ color: '#888888' }}>⏳ 上传中...</p>
-                  )}
-                </div>
-              )}
-              {block.type === "audio" && (
-                <div className="space-y-2">
-                  <div className="flex gap-2">
-                    <input
-                      type="url"
-                      value={block.url}
-                      onChange={(e) => updateBlock(index, { ...block, url: e.target.value })}
-                      onFocus={() => setActiveBlock(index)}
-                      placeholder="音频 URL"
-                      className="flex-1 px-3 py-2 rounded border"
-                      style={{ borderColor: 'var(--border)', background: 'var(--bg-card)', color: '#e5e5e5' }}
-                    />
-                    <label className="px-4 py-2 rounded cursor-pointer text-sm text-white" style={{ background: 'var(--accent)' }}>
-                      📁 上传
-                      <input
-                        type="file"
-                        accept="audio/*"
-                        onChange={(e) => handleMediaUpload(index, e, "audio")}
-                        className="hidden"
-                      />
-                    </label>
-                  </div>
-                  {block.url && block.url !== "上传中..." && (
-                    <audio src={block.url} controls className="w-full" />
-                  )}
-                  {block.url === "上传中..." && (
-                    <p className="text-sm" style={{ color: '#888888' }}>⏳ 上传中...</p>
-                  )}
-                </div>
-              )}
-              {block.type === "divider" && (
-                <div className="py-4 text-center" style={{ color: '#888888' }}>
-                  <hr style={{ border: 'none', height: '1px', background: 'linear-gradient(90deg, transparent, #ccc, transparent)' }} />
-                  <span className="text-xs mt-2 block">— 分割线 —</span>
-                </div>
-              )}
-            </div>
-          ))}
+              摘要
+            </label>
+            <input
+              type="text"
+              value={excerpt}
+              onChange={(e) => setExcerpt(e.target.value)}
+              placeholder="简短描述（可选）"
+              className="w-full px-4 py-3"
+              style={{
+                border: "1px solid var(--border)",
+                background: "#fff",
+                color: "#333",
+                borderRadius: 0,
+              }}
+            />
+          </div>
+          <div>
+            <label
+              className="block text-sm mb-2"
+              style={{ color: "#888" }}
+            >
+              标签（逗号分隔）
+            </label>
+            <input
+              type="text"
+              value={tags}
+              onChange={(e) => setTags(e.target.value)}
+              placeholder="如：随笔, 思考"
+              className="w-full px-4 py-3"
+              style={{
+                border: "1px solid var(--border)",
+                background: "#fff",
+                color: "#333",
+                borderRadius: 0,
+              }}
+            />
+          </div>
         </div>
 
-        {/* 添加块按钮 */}
-        <button
-          type="button"
-          onClick={() => addBlock("paragraph")}
-          className="w-full py-3 rounded-lg border-2 border-dashed"
-          style={{ borderColor: 'var(--border)', color: '#888888' }}
-        >
-          + 添加内容块
-        </button>
+        {/* 富文本编辑器工具栏 */}
+        <div>
+          <label
+            className="block text-sm mb-2"
+            style={{ color: "#888" }}
+          >
+            文章内容
+          </label>
+          <div
+            className="flex flex-wrap items-center gap-1 p-2"
+            style={{
+              background: "#1a1a1a",
+              borderBottom: "1px solid var(--border)",
+            }}
+          >
+            <ToolbarButton
+              onClick={() =>
+                editor?.chain().focus().toggleBold().run()
+              }
+              active={editor?.isActive("bold")}
+              title="加粗 (Ctrl+B)"
+            >
+              <strong>B</strong>
+            </ToolbarButton>
+            <ToolbarButton
+              onClick={() =>
+                editor?.chain().focus().toggleItalic().run()
+              }
+              active={editor?.isActive("italic")}
+              title="斜体 (Ctrl+I)"
+            >
+              <em>I</em>
+            </ToolbarButton>
+            <ToolbarButton
+              onClick={() =>
+                editor?.chain().focus().toggleStrike().run()
+              }
+              active={editor?.isActive("strike")}
+              title="删除线"
+            >
+              <s>S</s>
+            </ToolbarButton>
+
+            <Divider />
+
+            <ToolbarButton
+              onClick={() =>
+                editor
+                  ?.chain()
+                  .focus()
+                  .toggleHeading({ level: 2 })
+                  .run()
+              }
+              active={editor?.isActive("heading", { level: 2 })}
+              title="二级标题"
+            >
+              H2
+            </ToolbarButton>
+            <ToolbarButton
+              onClick={() =>
+                editor
+                  ?.chain()
+                  .focus()
+                  .toggleHeading({ level: 3 })
+                  .run()
+              }
+              active={editor?.isActive("heading", { level: 3 })}
+              title="三级标题"
+            >
+              H3
+            </ToolbarButton>
+
+            <Divider />
+
+            <ToolbarButton
+              onClick={() =>
+                editor?.chain().focus().toggleBulletList().run()
+              }
+              active={editor?.isActive("bulletList")}
+              title="无序列表"
+            >
+              &#8226;
+            </ToolbarButton>
+            <ToolbarButton
+              onClick={() =>
+                editor?.chain().focus().toggleOrderedList().run()
+              }
+              active={editor?.isActive("orderedList")}
+              title="有序列表"
+            >
+              1.
+            </ToolbarButton>
+            <ToolbarButton
+              onClick={() =>
+                editor?.chain().focus().toggleBlockquote().run()
+              }
+              active={editor?.isActive("blockquote")}
+              title="引用"
+            >
+              &#8220;
+            </ToolbarButton>
+            <ToolbarButton
+              onClick={() =>
+                editor?.chain().focus().setHorizontalRule().run()
+              }
+              title="分割线"
+            >
+              &mdash;
+            </ToolbarButton>
+
+            <Divider />
+
+            <ToolbarButton onClick={addImage} title="插入图片 URL">
+              🖼️
+            </ToolbarButton>
+            <ToolbarButton
+              onClick={handleLocalImageUpload}
+              title="上传本地图片"
+            >
+              📁
+            </ToolbarButton>
+
+            <Divider />
+
+            <ToolbarButton
+              onClick={() => editor?.chain().focus().undo().run()}
+              disabled={!editor?.can().undo()}
+              title="撤销 (Ctrl+Z)"
+            >
+              ↩
+            </ToolbarButton>
+            <ToolbarButton
+              onClick={() => editor?.chain().focus().redo().run()}
+              disabled={!editor?.can().redo()}
+              title="重做 (Ctrl+Y)"
+            >
+              ↪
+            </ToolbarButton>
+          </div>
+
+          {/* 编辑器区域 */}
+          <div
+            className="min-h-[400px]"
+            style={{
+              background: "#fff",
+              border: "1px solid var(--border)",
+              borderTop: "none",
+            }}
+          >
+            <EditorContent editor={editor} />
+          </div>
+        </div>
 
         {message && (
           <div
-            className={`p-4 rounded-lg ${
-              message.type === "success" ? "bg-green-50 text-green-700" : "bg-red-50 text-red-700"
+            className={`p-4 ${
+              message.type === "success"
+                ? "bg-green-50 text-green-700"
+                : "bg-red-50 text-red-700"
             }`}
           >
             {message.text}
@@ -845,10 +977,14 @@ export default function AdminPage() {
         <button
           type="submit"
           disabled={isPublishing}
-          className="px-8 py-3 text-white rounded-lg transition-colors disabled:opacity-50"
-          style={{ background: 'var(--accent)' }}
+          className="px-8 py-3 text-white disabled:opacity-50"
+          style={{ background: "var(--accent)", borderRadius: 0 }}
         >
-          {isPublishing ? "发布中..." : "🚀 发布文章"}
+          {isPublishing
+            ? "发布中..."
+            : editingPostId
+              ? "更新文章"
+              : "发布文章"}
         </button>
       </form>
     </div>
